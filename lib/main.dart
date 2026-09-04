@@ -1,6 +1,7 @@
 import 'package:android_project/features/passport/passport_screen.dart';
 import 'package:flutter/material.dart';
 import 'features/planner/planner_screen.dart';
+import 'theme/app_theme.dart';
 
 void main(){
   runApp(const VietNamExplorerApp()); // đây là tên của ứng dụng
@@ -14,10 +15,7 @@ class VietNamExplorerApp extends StatelessWidget {
     return MaterialApp(
       title: 'Vietnam Explorer',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: const Color(0xFF0F4C3A),// màu xanh ngọc lục bảo
-        scaffoldBackgroundColor: const Color(0xFFF7F8FA)
-      ),
+      theme: AppTheme.lightTheme,
       home: const MainNavigationScreen(),
     );
   }
