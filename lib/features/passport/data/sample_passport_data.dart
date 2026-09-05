@@ -26,21 +26,21 @@ final sampleProfile = TravelerProfile(
       imageUrl: 'https://picsum.photos/seed/sapa/400/500',
       visitedDate: DateTime(2026, 6, 20),
     ),
-    const PassportStamp(
+    PassportStamp(
       placeName: 'Địa đạo Củ Chi',
       province: 'TP.HCM',
       imageUrl: 'https://picsum.photos/seed/cuchi/400/500',
       visitedDate: DateTime(2000),
       isUnlocked: false,
     ),
-    const PassportStamp(
+    PassportStamp(
       placeName: 'Đà Lạt mộng mơ',
       province: 'Lâm Đồng',
       imageUrl: 'https://picsum.photos/seed/dalat/400/500',
       visitedDate: DateTime(2000),
       isUnlocked: false,
     ),
-    const PassportStamp(
+    PassportStamp(
       placeName: 'Phong Nha - Kẻ Bàng',
       province: 'Quảng Bình',
       imageUrl: 'https://picsum.photos/seed/phongnha/400/500',
