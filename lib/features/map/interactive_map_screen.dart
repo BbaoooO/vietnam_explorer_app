@@ -2,7 +2,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-// Model lưu trữ thông tin điểm đến
 class Destination {
   final String id;
   final String name;
@@ -32,86 +31,92 @@ class Destination {
     required this.region,
   });
 }
-
 class InteractiveMapScreen extends StatefulWidget {
   const InteractiveMapScreen({super.key});
 
   @override
   State<InteractiveMapScreen> createState() => _InteractiveMapScreenState();
 }
-
 class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
   GoogleMapController? _mapController;
   Destination? _selectedDestination;
   String _selectedRegion = 'All';
   final Set<Marker> _markers = {};
 
-  // Color Palette theo Design System Modern Heritage
   static const Color primaryColor = Color(0xFF003426);
   static const Color secondaryFixed = Color(0xFFFFDF9D);
   static const Color secondaryContainer = Color(0xFFFCC019);
 
-  // Data mẫu
   final List<Destination> _destinations = [
     Destination(
       id: '1',
-      name: 'Tran Quoc Pagoda',
-      subtitle: 'Hanoi, Northern Vietnam',
-      category: 'Heritage Site',
-      imageUrl:
-      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=600',
-      entryFee: 'Free',
-      bestTime: 'Late Afternoon',
-      rating: 4.8,
-      reviewCount: 2100,
-      position: const LatLng(21.0469, 105.8189),
-      icon: Icons.temple_buddhist,
-      region: 'North',
-    ),
-    Destination(
-      id: '2',
-      name: 'My Khe Beach',
-      subtitle: 'Da Nang, Central Vietnam',
-      category: 'Beach',
-      imageUrl:
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600',
-      entryFee: 'Free',
-      bestTime: 'Sunrise',
-      rating: 4.6,
-      reviewCount: 1500,
-      position: const LatLng(16.0544, 108.2469),
-      icon: Icons.beach_access,
+      name: 'Phong Nha Caves',
+      subtitle: 'Quang Binh, Central Vietnam',
+      category: 'Adventure & Nature',
+      imageUrl: 'https://image.vietnam.travel/sites/default/files/styles/top_banner/public/2023-10/pn_0.jpg?itok=mVFZFIYD',
+      entryFee: '150,000 VND',
+      bestTime: 'Dry Season (Feb - Aug)',
+      rating: 4.9,
+      reviewCount: 1150,
+      position: const LatLng(17.5833, 106.2833),
+      icon: Icons.terrain,
       region: 'Central',
     ),
     Destination(
-      id: '3',
-      name: 'Sapa Terraces',
-      subtitle: 'Lao Cai, Northern Vietnam',
-      category: 'Mountain',
-      imageUrl:
-      'https://images.unsplash.com/photo-1528127269322-539801943592?w=600',
-      entryFee: '50,000 VND',
-      bestTime: 'Morning',
-      rating: 4.9,
-      reviewCount: 980,
-      position: const LatLng(22.3364, 103.8438),
+      id: '2',
+      name: 'Sun World Ba Den Mountain',
+      subtitle: 'Tay Ninh, Southern Vietnam',
+      category: 'Mountain & Spirituality',
+      imageUrl: 'https://www.vecaptreonuibaden.com/wp-content/uploads/2023/12/Sun-World-Ba-Den-Mountain_Tay-Ninh_eticket247.jpg',
+      entryFee: '450,000 VND',
+      bestTime: 'Early Morning',
+      rating: 4.7,
+      reviewCount: 1850,
+      position: const LatLng(11.3736, 106.1667),
       icon: Icons.landscape,
+      region: 'South',
+    ),
+    Destination(
+      id: '3',
+      name: 'Ha Long Bay',
+      subtitle: 'Quang Ninh, Northern Vietnam',
+      category: 'Natural Heritage',
+      imageUrl: 'https://pystravel.vn/_next/image?url=https%3A%2F%2Fbooking.pystravel.vn%2Fuploads%2Fposts%2Falbums%2F17369%2F951812e8444a863de34efaa6efe460ec.jpg&w=1920&q=75',
+      entryFee: '150,000 VND',
+      bestTime: 'October to April',
+      rating: 4.9,
+      reviewCount: 3200,
+      position: const LatLng(20.9101, 107.1839),
+      icon: Icons.sailing,
       region: 'North',
     ),
     Destination(
       id: '4',
-      name: 'Mekong Delta',
-      subtitle: 'Can Tho, Southern Vietnam',
-      category: 'Nature',
-      imageUrl:
-      'https://images.unsplash.com/photo-1528127269322-539801943592?w=600',
-      entryFee: '30,000 VND',
-      bestTime: 'Early Morning',
-      rating: 4.7,
-      reviewCount: 760,
-      position: const LatLng(10.0452, 105.7469),
-      icon: Icons.water,
-      region: 'South',
+      name: 'Cuc Phuong National Park',
+      subtitle: 'Ninh Binh, Northern Vietnam',
+      category: 'National Park & Heritage',
+      imageUrl: 'https://phuotvivu.com/blog/wp-content/uploads/2021/09/vuon-quoc-gia-cuc-phuong.jpg',
+      entryFee: '60,000 VND',
+      bestTime: 'Butterfly Season (Apr - May)',
+      rating: 4.9,
+      reviewCount: 1420,
+      position: const LatLng(20.3167, 105.6167),
+      icon: Icons.forest,
+      region: 'North',
+    ),
+    Destination(
+      id: '5',
+      name: 'Hoi An Ancient Town',
+      subtitle: 'Quang Nam, Central Vietnam',
+      category: 'Cultural Heritage',
+      imageUrl: 'https://cdn3.ivivu.com/2023/10/du-lich-hoi-an-ivivu-img1.jpg',
+      entryFee: '120,000 VND',
+      bestTime: 'Full Moon Lantern Festival',
+      rating: 4.8,
+      reviewCount: 2800,
+      position: const LatLng(15.8801, 108.3380),
+      icon: Icons.storefront,
+      region: 'Central',
     ),
   ];
 
@@ -126,12 +131,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     _createMarkers();
   }
 
-  /// Vẽ 1 pin hình giọt nước (teardrop) có icon bên trong bằng Canvas,
-  /// sau đó chuyển thành ảnh (BitmapDescriptor) để Google Maps hiển thị được.
-  Future<BitmapDescriptor> _createCustomMarker(
-      IconData icon, {
-        bool active = false,
-      }) async {
+  Future<BitmapDescriptor> _createCustomMarker(IconData icon, {bool active = false}) async {
     final double width = active ? 56 : 40;
     final double height = active ? 64 : 48;
 
@@ -147,33 +147,16 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
       ..close();
 
     canvas.drawPath(pinPath, Paint()..color = primaryColor);
-    canvas.drawPath(
-      pinPath,
-      Paint()
-        ..color = secondaryFixed
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = active ? 3 : 2,
-    );
+    canvas.drawPath(pinPath, Paint()..color = secondaryFixed..style = PaintingStyle.stroke..strokeWidth = active ? 3 : 2);
 
     final iconColor = active ? secondaryFixed : Colors.white;
     final textPainter = TextPainter(textDirection: TextDirection.ltr)
       ..text = TextSpan(
         text: String.fromCharCode(icon.codePoint),
-        style: TextStyle(
-          fontSize: active ? 26 : 18,
-          fontFamily: icon.fontFamily,
-          package: icon.fontPackage,
-          color: iconColor,
-        ),
+        style: TextStyle(fontSize: active ? 26 : 18, fontFamily: icon.fontFamily, package: icon.fontPackage, color: iconColor),
       )
       ..layout();
-    textPainter.paint(
-      canvas,
-      Offset(
-        width / 2 - textPainter.width / 2,
-        width / 2 - textPainter.height / 2 - 2,
-      ),
-    );
+    textPainter.paint(canvas, Offset(width / 2 - textPainter.width / 2, width / 2 - textPainter.height / 2 - 2));
 
     final picture = recorder.endRecording();
     final image = await picture.toImage(width.toInt(), height.toInt());
@@ -195,18 +178,14 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
           onTap: () {
             setState(() => _selectedDestination = dest);
             _createMarkers();
-            _mapController?.animateCamera(
-              CameraUpdate.newLatLng(dest.position),
-            );
+            _mapController?.animateCamera(CameraUpdate.newLatLng(dest.position));
           },
         ),
       );
     }
     if (!mounted) return;
     setState(() {
-      _markers
-        ..clear()
-        ..addAll(newMarkers);
+      _markers..clear()..addAll(newMarkers);
     });
   }
 
@@ -225,10 +204,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
       body: Stack(
         children: [
           GoogleMap(
-            initialCameraPosition: const CameraPosition(
-              target: LatLng(16.0, 106.0),
-              zoom: 5.2,
-            ),
+            initialCameraPosition: const CameraPosition(target: LatLng(16.0, 106.0), zoom: 5.2),
             markers: _markers,
             myLocationButtonEnabled: false,
             zoomControlsEnabled: false,
@@ -239,16 +215,9 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
             top: MediaQuery.of(context).padding.top + 12,
             left: 16,
             right: 16,
-            child: Column(
-              children: [
-                _buildSearchBar(),
-                const SizedBox(height: 8),
-                _buildRegionChips(),
-              ],
-            ),
+            child: Column(children: [_buildSearchBar(), const SizedBox(height: 8), _buildRegionChips()]),
           ),
-          if (_selectedDestination != null)
-            _buildDetailSheet(_selectedDestination!),
+          if (_selectedDestination != null) _buildDetailSheet(_selectedDestination!),
         ],
       ),
     );
@@ -273,11 +242,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
               const Expanded(
                 child: TextField(
                   style: TextStyle(fontFamily: 'Be Vietnam Pro'),
-                  decoration: InputDecoration(
-                    hintText: 'Search landmarks, cities...',
-                    border: InputBorder.none,
-                    isDense: true,
-                  ),
+                  decoration: InputDecoration(hintText: 'Search landmarks, cities...', border: InputBorder.none, isDense: true),
                 ),
               ),
               Container(width: 1, height: 24, color: Colors.grey.shade300),
@@ -302,24 +267,12 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
           final region = regions[index];
           final selected = region == _selectedRegion;
           return ChoiceChip(
-            label: Text(
-              region,
-              style: TextStyle(
-                fontFamily: 'Be Vietnam Pro',
-                color: selected ? Colors.white : primaryColor,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-            ),
+            label: Text(region, style: TextStyle(fontFamily: 'Be Vietnam Pro', color: selected ? Colors.white : primaryColor, fontWeight: FontWeight.w600, fontSize: 12)),
             selected: selected,
             onSelected: (_) => _onRegionSelected(region),
             selectedColor: primaryColor,
             backgroundColor: Colors.white,
-            shape: StadiumBorder(
-              side: BorderSide(
-                color: selected ? primaryColor : primaryColor.withOpacity(0.4),
-              ),
-            ),
+            shape: StadiumBorder(side: BorderSide(color: selected ? primaryColor : primaryColor.withOpacity(0.4))),
           );
         },
       ),
@@ -336,7 +289,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
         child: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
-            // Tăng bottom padding lên 110 để tránh bị thanh navigation bar nổi che mất nút bấm bên dưới
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 110),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.85),
@@ -351,10 +303,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                     width: 48,
                     height: 5,
                     margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade400,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
+                    decoration: BoxDecoration(color: Colors.grey.shade400, borderRadius: BorderRadius.circular(999)),
                   ),
                 ),
                 Row(
@@ -365,41 +314,13 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: primaryColor.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              dest.category,
-                              style: const TextStyle(
-                                fontFamily: 'Be Vietnam Pro',
-                                color: primaryColor,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(color: primaryColor.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                            child: Text(dest.category, style: const TextStyle(fontFamily: 'Be Vietnam Pro', color: primaryColor, fontSize: 12, fontWeight: FontWeight.w600)),
                           ),
                           const SizedBox(height: 6),
-                          Text(
-                            dest.name,
-                            style: const TextStyle(
-                              fontFamily: 'Be Vietnam Pro',
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor,
-                            ),
-                          ),
-                          Text(
-                            dest.subtitle,
-                            style: TextStyle(
-                              fontFamily: 'Be Vietnam Pro',
-                              color: Colors.grey.shade700,
-                            ),
-                          ),
+                          Text(dest.name, style: const TextStyle(fontFamily: 'Be Vietnam Pro', fontSize: 22, fontWeight: FontWeight.bold, color: primaryColor)),
+                          Text(dest.subtitle, style: TextStyle(fontFamily: 'Be Vietnam Pro', color: Colors.grey.shade700)),
                         ],
                       ),
                     ),
@@ -409,14 +330,8 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                       child: Container(
                         width: 40,
                         height: 40,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.favorite_border,
-                          color: Colors.grey,
-                        ),
+                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                        child: const Icon(Icons.favorite_border, color: Colors.grey),
                       ),
                     ),
                   ],
@@ -432,34 +347,21 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                         height: 130,
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => Container(
+                        errorBuilder: (_, __, ___) => Container(
                           height: 130,
                           color: Colors.grey.shade300,
                           child: const Icon(Icons.image_not_supported),
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.85),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.85), borderRadius: BorderRadius.circular(999)),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.threesixty, color: primaryColor, size: 18),
                             SizedBox(width: 6),
-                            Text(
-                              'View 360°',
-                              style: TextStyle(
-                                fontFamily: 'Be Vietnam Pro',
-                                color: primaryColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                            Text('View 360°', style: TextStyle(fontFamily: 'Be Vietnam Pro', color: primaryColor, fontWeight: FontWeight.w600)),
                           ],
                         ),
                       ),
@@ -469,21 +371,9 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Expanded(
-                      child: _buildInfoCard(
-                        Icons.payments,
-                        'Entry Fee',
-                        dest.entryFee,
-                      ),
-                    ),
+                    Expanded(child: _buildInfoCard(Icons.payments, 'Entry Fee', dest.entryFee)),
                     const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildInfoCard(
-                        Icons.schedule,
-                        'Best Time',
-                        dest.bestTime,
-                      ),
-                    ),
+                    Expanded(child: _buildInfoCard(Icons.schedule, 'Best Time', dest.bestTime)),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -492,17 +382,12 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                   child: ElevatedButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.add_circle_outline),
-                    label: const Text(
-                      'Add to Itinerary',
-                      style: TextStyle(fontFamily: 'Be Vietnam Pro'),
-                    ),
+                    label: const Text('Add to Itinerary', style: TextStyle(fontFamily: 'Be Vietnam Pro')),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: secondaryContainer,
                       foregroundColor: primaryColor,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                   ),
                 ),
@@ -529,24 +414,11 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
             children: [
               Icon(icon, size: 16, color: Colors.grey.shade600),
               const SizedBox(width: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontFamily: 'Be Vietnam Pro',
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                ),
-              ),
+              Text(label, style: TextStyle(fontFamily: 'Be Vietnam Pro', fontSize: 12, color: Colors.grey.shade600)),
             ],
           ),
           const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              fontFamily: 'Be Vietnam Pro',
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          Text(value, style: const TextStyle(fontFamily: 'Be Vietnam Pro', fontWeight: FontWeight.w600)),
         ],
       ),
     );

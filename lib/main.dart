@@ -1,6 +1,7 @@
 import 'package:android_project/features/passport/passport_screen.dart';
 import 'package:flutter/material.dart';
 import 'features/planner/planner_screen.dart';
+import 'features/map/interactive_map_screen.dart';
 
 void main(){
   runApp(const VietNamExplorerApp()); // đây là tên của ứng dụng
@@ -36,7 +37,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>{
   //Danh sách các màn hình con
   final List<Widget> _screens = [
     const Center(child: Text('Home & Discover Screen')),
-    const Center(child: Text('Interactive Map Screen')),
+    const InteractiveMapScreen(),
     const PlannerScreen(),
     const PassportScreen(),
     const Center(child: Text('Profile Screen'))
