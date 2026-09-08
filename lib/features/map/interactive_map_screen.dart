@@ -58,8 +58,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
       name: 'Tran Quoc Pagoda',
       subtitle: 'Hanoi, Northern Vietnam',
       category: 'Heritage Site',
-      imageUrl:
-      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=600',
+      imageUrl: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=600',
       entryFee: 'Free',
       bestTime: 'Late Afternoon',
       rating: 4.8,
@@ -73,8 +72,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
       name: 'My Khe Beach',
       subtitle: 'Da Nang, Central Vietnam',
       category: 'Beach',
-      imageUrl:
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600',
+      imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600',
       entryFee: 'Free',
       bestTime: 'Sunrise',
       rating: 4.6,
@@ -88,8 +86,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
       name: 'Sapa Terraces',
       subtitle: 'Lao Cai, Northern Vietnam',
       category: 'Mountain',
-      imageUrl:
-      'https://images.unsplash.com/photo-1528127269322-539801943592?w=600',
+      imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=600',
       entryFee: '50,000 VND',
       bestTime: 'Morning',
       rating: 4.9,
@@ -103,8 +100,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
       name: 'Mekong Delta',
       subtitle: 'Can Tho, Southern Vietnam',
       category: 'Nature',
-      imageUrl:
-      'https://images.unsplash.com/photo-1528127269322-539801943592?w=600',
+      imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=600',
       entryFee: '30,000 VND',
       bestTime: 'Early Morning',
       rating: 4.7,
@@ -126,8 +122,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     _createMarkers();
   }
 
-  /// Vẽ 1 pin hình giọt nước (teardrop) có icon bên trong bằng Canvas,
-  /// sau đó chuyển thành ảnh (BitmapDescriptor) để Google Maps hiển thị được.
+  /// Sửa lỗi crash bằng cách tương thích với các bản Flutter SDK mới nhất
   Future<BitmapDescriptor> _createCustomMarker(
       IconData icon, {
         bool active = false,
@@ -178,7 +173,9 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     final picture = recorder.endRecording();
     final image = await picture.toImage(width.toInt(), height.toInt());
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-    return BitmapDescriptor.bytes(bytes!.buffer.asUint8List());
+
+    // Đã sửa lại hàm tạo BitmapDescriptor chuẩn
+    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
 
   Future<void> _createMarkers() async {
@@ -262,9 +259,9 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: const Color(0xB3FFFFFF), // Thay withOpacity bằng mã Hex
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: Colors.white.withOpacity(0.3)),
+            border: Border.all(color: const Color(0x4DFFFFFF)),
           ),
           child: Row(
             children: [
@@ -272,7 +269,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
               const SizedBox(width: 8),
               const Expanded(
                 child: TextField(
-                  style: TextStyle(fontFamily: 'Be Vietnam Pro'),
                   decoration: InputDecoration(
                     hintText: 'Search landmarks, cities...',
                     border: InputBorder.none,
@@ -305,7 +301,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
             label: Text(
               region,
               style: TextStyle(
-                fontFamily: 'Be Vietnam Pro',
                 color: selected ? Colors.white : primaryColor,
                 fontWeight: FontWeight.w600,
                 fontSize: 12,
@@ -317,7 +312,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
             backgroundColor: Colors.white,
             shape: StadiumBorder(
               side: BorderSide(
-                color: selected ? primaryColor : primaryColor.withOpacity(0.4),
+                color: selected ? primaryColor : const Color(0x66003426),
               ),
             ),
           );
@@ -336,11 +331,10 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
         child: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
-            // Tăng bottom padding lên 110 để tránh bị thanh navigation bar nổi che mất nút bấm bên dưới
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 110),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.85),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
+            decoration: const BoxDecoration(
+              color: Color(0xD9FFFFFF),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -370,13 +364,12 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: primaryColor.withOpacity(0.1),
+                              color: const Color(0x1A003426),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               dest.category,
                               style: const TextStyle(
-                                fontFamily: 'Be Vietnam Pro',
                                 color: primaryColor,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -387,7 +380,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                           Text(
                             dest.name,
                             style: const TextStyle(
-                              fontFamily: 'Be Vietnam Pro',
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: primaryColor,
@@ -396,28 +388,15 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                           Text(
                             dest.subtitle,
                             style: TextStyle(
-                              fontFamily: 'Be Vietnam Pro',
                               color: Colors.grey.shade700,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    InkWell(
-                      onTap: () {},
-                      customBorder: const CircleBorder(),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.favorite_border,
-                          color: Colors.grey,
-                        ),
-                      ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                      onPressed: () => setState(() => _selectedDestination = null),
                     ),
                   ],
                 ),
@@ -444,7 +423,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.85),
+                          color: const Color(0xD9FFFFFF),
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: const Row(
@@ -455,7 +434,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                             Text(
                               'View 360°',
                               style: TextStyle(
-                                fontFamily: 'Be Vietnam Pro',
                                 color: primaryColor,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -492,10 +470,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                   child: ElevatedButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.add_circle_outline),
-                    label: const Text(
-                      'Add to Itinerary',
-                      style: TextStyle(fontFamily: 'Be Vietnam Pro'),
-                    ),
+                    label: const Text('Add to Itinerary'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: secondaryContainer,
                       foregroundColor: primaryColor,
@@ -518,9 +493,9 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.5),
+        color: const Color(0x80FFFFFF),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white.withOpacity(0.4)),
+        border: Border.all(color: const Color(0x66FFFFFF)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -532,7 +507,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
               Text(
                 label,
                 style: TextStyle(
-                  fontFamily: 'Be Vietnam Pro',
                   fontSize: 12,
                   color: Colors.grey.shade600,
                 ),
@@ -543,7 +517,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
           Text(
             value,
             style: const TextStyle(
-              fontFamily: 'Be Vietnam Pro',
               fontWeight: FontWeight.w600,
             ),
           ),
