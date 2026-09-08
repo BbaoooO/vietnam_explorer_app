@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'features/planner/planner_screen.dart';
 import 'features/passport/passport_screen.dart';
 import 'features/passport/data/sample_passport_data.dart';
+import 'theme/app_theme.dart';
 
-void main(){
-  runApp(const VietNamExplorerApp()); // đây là tên của ứng dụng
+void main() {
+  runApp(const VietNamExplorerApp());
 }
 
 class VietNamExplorerApp extends StatelessWidget {
@@ -15,10 +16,7 @@ class VietNamExplorerApp extends StatelessWidget {
     return MaterialApp(
       title: 'Vietnam Explorer',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-          primaryColor: const Color(0xFF0F4C3A),// màu xanh ngọc lục bảo
-          scaffoldBackgroundColor: const Color(0xFFF7F8FA)
-      ),
+      theme: AppTheme.lightTheme,
       home: const MainNavigationScreen(),
     );
   }
@@ -31,16 +29,16 @@ class MainNavigationScreen extends StatefulWidget {
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
-class _MainNavigationScreenState extends State<MainNavigationScreen>{
+class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
 
-  //Danh sách các màn hình con
+  // Danh sách các màn hình con
   final List<Widget> _screens = [
     const Center(child: Text('Home & Discover Screen')),
     const Center(child: Text('Interactive Map Screen')),
     const PlannerScreen(),
     PassportScreen(profile: sampleProfile),
-    const Center(child: Text('Profile Screen'))
+    const Center(child: Text('Profile Screen')),
   ];
 
   @override
@@ -59,20 +57,25 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>{
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Discover'),
+            icon: Icon(Icons.home),
+            label: 'Discover',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.map),
-              label: 'Map'),
+            icon: Icon(Icons.map),
+            label: 'Map',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month),
-              label: 'Trip Planner'),
+            icon: Icon(Icons.calendar_month),
+            label: 'Trip Planner',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.badge),
-              label: 'Passport'),
+            icon: Icon(Icons.badge),
+            label: 'Passport',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile'),
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
         ],
       ),
     );
