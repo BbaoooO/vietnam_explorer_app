@@ -1,14 +1,9 @@
 
 import '../../core/explorer_app_bar.dart';
 import 'package:flutter/material.dart';
+import '../../theme/app_theme.dart';
 import 'models/traveler_profile.dart';
 import 'widgets/stamp_card.dart';
-
-// TODO: Nếu core/explorer_app_bar.dart đã có sẵn AppBar dùng chung cho cả app
-// (Planner, v.v...), cân nhắc thay _buildAppBar() bên dưới bằng widget đó để
-// đồng bộ giao diện, ví dụ:
-//   import '../../core/explorer_app_bar.dart';
-//   appBar: ExplorerAppBar(title: 'Hộ chiếu du lịch số'),
 
 /// Màn hình "Hộ chiếu du lịch số" — hiển thị hồ sơ người dùng,
 /// tiến độ khám phá và lưới các con dấu địa danh (đã/chưa ghé thăm).
@@ -20,10 +15,11 @@ class PassportScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F1E8), // nền giấy ngà
+      backgroundColor: AppTheme.backgroundColor, // đồng bộ nền chung của app
       body: CustomScrollView(
         slivers: [
-          _buildAppBar(context),
+          SliverToBoxAdapter(child: _buildAppBar(context)),
+          SliverToBoxAdapter(child: _buildHeader(context)),
           SliverToBoxAdapter(child: _buildPassportCard(context)),
           SliverToBoxAdapter(child: _buildProgressSection(context)),
           _buildStampsGrid(context),
@@ -33,30 +29,34 @@ class PassportScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- AppBar ----------------
+  // ---------------- AppBar dùng chung toàn app ----------------
   Widget _buildAppBar(BuildContext context) {
-    return SliverAppBar(
-      pinned: true,
-      backgroundColor: const Color(0xFF7A2E2E), // đỏ trầm kiểu passport
-      expandedHeight: 90,
-      flexibleSpace: const FlexibleSpaceBar(
-        titlePadding: EdgeInsets.only(left: 20, bottom: 16),
-        title: Text(
-          'Hộ chiếu du lịch số',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+    return const ExplorerAppBar();
+  }
+
+  // ---------------- Tiêu đề "Digital Passport" ----------------
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Hộ chiếu du lịch số',
+            style: TextStyle(
+              color: AppTheme.primaryColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+            ),
           ),
-        ),
+          const SizedBox(height: 6),
+          Text(
+            'Theo dõi hành trình khắp Việt Nam của bạn. Thu thập con dấu '
+            'từ các tỉnh thành đã ghé thăm và mở khóa thành tựu.',
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 13, height: 1.4),
+          ),
+        ],
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.qr_code_2, color: Colors.white),
-          tooltip: 'Mã QR chia sẻ',
-          onPressed: () {},
-        ),
-      ],
     );
   }
 
@@ -67,7 +67,7 @@ class PassportScreen extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF7A2E2E), Color(0xFF9C4444)],
+          colors: [AppTheme.primaryColor, Color(0xFF15694F)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -87,7 +87,7 @@ class PassportScreen extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 32,
-                backgroundColor: Colors.white,
+                backgroundColor: AppTheme.secondaryColor,
                 backgroundImage: NetworkImage(profile.avatarUrl),
               ),
               const SizedBox(width: 14),
@@ -157,7 +157,7 @@ class PassportScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE0DACB)),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,7 +172,7 @@ class PassportScreen extends StatelessWidget {
               Text(
                 '${profile.visitedCount}/${profile.totalDestinations}',
                 style: const TextStyle(
-                    color: Color(0xFF7A2E2E), fontWeight: FontWeight.bold),
+                    color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -182,9 +182,9 @@ class PassportScreen extends StatelessWidget {
             child: LinearProgressIndicator(
               value: profile.progress,
               minHeight: 10,
-              backgroundColor: const Color(0xFFEFE9DA),
+              backgroundColor: const Color(0xFFF0F1F3),
               valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color(0xFFC79A3B)), // vàng đồng
+                  AppTheme.secondaryColor), // vàng theme chung
             ),
           ),
         ],
