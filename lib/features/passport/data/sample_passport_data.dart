@@ -7,6 +7,12 @@ final sampleProfile = TravelerProfile(
   passportId: 'VN-TRAVELER-000123',
   issueDate: DateTime(2026, 1, 15),
   totalDestinations: 6,
+  levelNumber: 3,
+  levelTitle: 'Wandering Scholar',
+  currentXP: 1450,
+  xpToNextLevel: 2000,
+  nextBadgeName: 'Mekong Navigator',
+  nextBadgeLevel: 4,
   stamps: [
     PassportStamp(
       placeName: 'Vịnh Hạ Long',
