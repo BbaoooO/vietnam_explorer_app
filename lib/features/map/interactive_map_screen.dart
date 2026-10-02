@@ -1,37 +1,8 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-// Model lưu trữ thông tin điểm đến
-class Destination {
-  final String id;
-  final String name;
-  final String subtitle;
-  final String category;
-  final String imageUrl;
-  final String entryFee;
-  final String bestTime;
-  final double rating;
-  final int reviewCount;
-  final LatLng position;
-  final IconData icon;
-  final String region;
-
-  Destination({
-    required this.id,
-    required this.name,
-    required this.subtitle,
-    required this.category,
-    required this.imageUrl,
-    required this.entryFee,
-    required this.bestTime,
-    required this.rating,
-    required this.reviewCount,
-    required this.position,
-    required this.icon,
-    required this.region,
-  });
-}
+import '../../core/models/destination_model.dart';
+import '../../core/repositories/dummy_data_repository.dart';
 
 class InteractiveMapScreen extends StatefulWidget {
   const InteractiveMapScreen({super.key});
@@ -46,74 +17,14 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
   String _selectedRegion = 'All';
   final Set<Marker> _markers = {};
 
-  // Color Palette theo Design System Modern Heritage
   static const Color primaryColor = Color(0xFF003426);
   static const Color secondaryFixed = Color(0xFFFFDF9D);
   static const Color secondaryContainer = Color(0xFFFCC019);
 
-  // Data mẫu
-  final List<Destination> _destinations = [
-    Destination(
-      id: '1',
-      name: 'Tran Quoc Pagoda',
-      subtitle: 'Hanoi, Northern Vietnam',
-      category: 'Heritage Site',
-      imageUrl: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=600',
-      entryFee: 'Free',
-      bestTime: 'Late Afternoon',
-      rating: 4.8,
-      reviewCount: 2100,
-      position: const LatLng(21.0469, 105.8189),
-      icon: Icons.temple_buddhist,
-      region: 'North',
-    ),
-    Destination(
-      id: '2',
-      name: 'My Khe Beach',
-      subtitle: 'Da Nang, Central Vietnam',
-      category: 'Beach',
-      imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600',
-      entryFee: 'Free',
-      bestTime: 'Sunrise',
-      rating: 4.6,
-      reviewCount: 1500,
-      position: const LatLng(16.0544, 108.2469),
-      icon: Icons.beach_access,
-      region: 'Central',
-    ),
-    Destination(
-      id: '3',
-      name: 'Sapa Terraces',
-      subtitle: 'Lao Cai, Northern Vietnam',
-      category: 'Mountain',
-      imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=600',
-      entryFee: '50,000 VND',
-      bestTime: 'Morning',
-      rating: 4.9,
-      reviewCount: 980,
-      position: const LatLng(22.3364, 103.8438),
-      icon: Icons.landscape,
-      region: 'North',
-    ),
-    Destination(
-      id: '4',
-      name: 'Mekong Delta',
-      subtitle: 'Can Tho, Southern Vietnam',
-      category: 'Nature',
-      imageUrl: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=600',
-      entryFee: '30,000 VND',
-      bestTime: 'Early Morning',
-      rating: 4.7,
-      reviewCount: 760,
-      position: const LatLng(10.0452, 105.7469),
-      icon: Icons.water,
-      region: 'South',
-    ),
-  ];
-
+  // Lấy dữ liệu trực tiếp từ Repository thay vì hardcode
   List<Destination> get _filteredDestinations {
-    if (_selectedRegion == 'All') return _destinations;
-    return _destinations.where((d) => d.region == _selectedRegion).toList();
+    if (_selectedRegion == 'All') return DummyDataRepository.destinations;
+    return DummyDataRepository.destinations.where((d) => d.region == _selectedRegion).toList();
   }
 
   @override
@@ -122,7 +33,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     _createMarkers();
   }
 
-  /// Sửa lỗi crash bằng cách tương thích với các bản Flutter SDK mới nhất
   Future<BitmapDescriptor> _createCustomMarker(
       IconData icon, {
         bool active = false,
@@ -174,7 +84,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     final image = await picture.toImage(width.toInt(), height.toInt());
     final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
 
-    // Đã sửa lại hàm tạo BitmapDescriptor chuẩn
     return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
 
@@ -259,7 +168,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: BoxDecoration(
-            color: const Color(0xB3FFFFFF), // Thay withOpacity bằng mã Hex
+            color: const Color(0xB3FFFFFF),
             borderRadius: BorderRadius.circular(999),
             border: Border.all(color: const Color(0x4DFFFFFF)),
           ),
