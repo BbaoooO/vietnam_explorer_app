@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../theme/app_theme.dart';
 import '../models/passport_stamp.dart';
 
 class StampCard extends StatelessWidget {
@@ -15,7 +16,7 @@ class StampCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: locked ? const Color(0xFFE0DACB) : const Color(0xFFC79A3B),
+          color: locked ? const Color(0xFFE5E7EB) : AppTheme.secondaryColor,
           width: locked ? 1 : 2,
         ),
       ),
@@ -79,12 +80,12 @@ class StampCard extends StatelessWidget {
                     Row(
                       children: [
                         const Icon(Icons.check_circle,
-                            color: Color(0xFFC79A3B), size: 13),
+                            color: AppTheme.secondaryColor, size: 13),
                         const SizedBox(width: 4),
                         Text(
                           '${stamp.visitedDate.day}/${stamp.visitedDate.month}/${stamp.visitedDate.year}',
                           style: const TextStyle(
-                              color: Color(0xFFE8D9A8), fontSize: 10),
+                              color: Color(0xFFFCE9A8), fontSize: 10),
                         ),
                       ],
                     ),

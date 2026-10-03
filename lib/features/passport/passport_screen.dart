@@ -1,29 +1,77 @@
-import 'package:flutter/material.dart';
-import 'models/traveler_profile.dart';
-import 'widgets/stamp_card.dart';
 
-// TODO: Nếu core/explorer_app_bar.dart đã có sẵn AppBar dùng chung cho cả app
-// (Planner, v.v...), cân nhắc thay _buildAppBar() bên dưới bằng widget đó để
-// đồng bộ giao diện, ví dụ:
-//   import '../../core/explorer_app_bar.dart';
-//   appBar: ExplorerAppBar(title: 'Hộ chiếu du lịch số'),
+import '../../core/explorer_app_bar.dart';
+import 'package:flutter/material.dart';
+import '../../theme/app_theme.dart';
+import 'data/collection_book_data.dart';
+import 'data/passport_storage_service.dart';
+import 'models/traveler_profile.dart';
+import 'widgets/province_badge_card.dart';
+import 'widgets/stamp_card.dart';
 
 /// Màn hình "Hộ chiếu du lịch số" — hiển thị hồ sơ người dùng,
 /// tiến độ khám phá và lưới các con dấu địa danh (đã/chưa ghé thăm).
-class PassportScreen extends StatelessWidget {
+///
+/// [profile] dùng làm dữ liệu khởi tạo/mặc định (VD: sampleProfile).
+/// Level/XP thật sẽ được đọc từ [PassportStorageService] và override lên trên,
+/// nếu người dùng đã có tiến độ lưu trước đó trên máy.
+class PassportScreen extends StatefulWidget {
   final TravelerProfile profile;
 
   const PassportScreen({super.key, required this.profile});
 
   @override
+  State<PassportScreen> createState() => _PassportScreenState();
+}
+
+class _PassportScreenState extends State<PassportScreen> {
+  final _storage = PassportStorageService();
+  late TravelerProfile profile;
+
+  @override
+  void initState() {
+    super.initState();
+    profile = widget.profile; // hiển thị tạm bằng sample data trong lúc chờ đọc storage
+    _loadSavedProgress();
+  }
+
+  Future<void> _loadSavedProgress() async {
+    final savedLevel = await _storage.readLevel();
+    final savedXp = await _storage.readXp();
+    // Nếu chưa từng lưu gì (savedLevel == 1 mặc định và không khớp sample),
+    // giữ nguyên dữ liệu mẫu để demo; khi đã có tiến độ thật thì override.
+    if (!mounted) return;
+    setState(() {
+      profile = TravelerProfile(
+        fullName: widget.profile.fullName,
+        avatarUrl: widget.profile.avatarUrl,
+        passportId: widget.profile.passportId,
+        issueDate: widget.profile.issueDate,
+        totalDestinations: widget.profile.totalDestinations,
+        stamps: widget.profile.stamps,
+        levelNumber: savedLevel,
+        levelTitle: widget.profile.levelTitle,
+        currentXP: savedXp,
+        xpToNextLevel: widget.profile.xpToNextLevel,
+        nextBadgeName: widget.profile.nextBadgeName,
+        nextBadgeLevel: widget.profile.nextBadgeLevel,
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F1E8), // nền giấy ngà
+      backgroundColor: AppTheme.backgroundColor, // đồng bộ nền chung của app
       body: CustomScrollView(
         slivers: [
-          _buildAppBar(context),
+          SliverToBoxAdapter(child: _buildAppBar(context)),
           SliverToBoxAdapter(child: _buildPassportCard(context)),
+          SliverToBoxAdapter(child: _buildHeader(context)),
+          SliverToBoxAdapter(child: _buildLevelCard(context)),
+          SliverToBoxAdapter(child: _buildCollectionBookHeader(context)),
+          _buildCollectionBookGrid(context),
           SliverToBoxAdapter(child: _buildProgressSection(context)),
+          SliverToBoxAdapter(child: _buildVisitedSectionHeader(context)),
           _buildStampsGrid(context),
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
@@ -31,30 +79,203 @@ class PassportScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- AppBar ----------------
+  // ---------------- AppBar dùng chung toàn app ----------------
   Widget _buildAppBar(BuildContext context) {
-    return SliverAppBar(
-      pinned: true,
-      backgroundColor: const Color(0xFF7A2E2E), // đỏ trầm kiểu passport
-      expandedHeight: 90,
-      flexibleSpace: const FlexibleSpaceBar(
-        titlePadding: EdgeInsets.only(left: 20, bottom: 16),
-        title: Text(
-          'Hộ chiếu du lịch số',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+    return const ExplorerAppBar();
+  }
+
+  // ---------------- Tiêu đề "Digital Passport" ----------------
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Digital\nPassport',
+            style: TextStyle(
+              color: AppTheme.primaryColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 32,
+              height: 1.1,
+            ),
           ),
+          const SizedBox(height: 10),
+          Text(
+            "Track your journey across Vietnam. Collect stamps from "
+            "provinces you've visited and unlock exclusive achievements.",
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 14, height: 1.4),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------- Card cấp độ & XP (Task 3.1) ----------------
+  Widget _buildLevelCard(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 64,
+              height: 64,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: AppTheme.primaryColor,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                'L${profile.levelNumber}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      profile.levelTitle,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                        height: 1.15,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Level ${profile.levelNumber} Explorer',
+                      style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '${profile.currentXP} / ${profile.xpToNextLevel}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                  Text('XP', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: profile.xpProgress,
+              minHeight: 8,
+              backgroundColor: const Color(0xFFE5E7EB),
+              valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.secondaryColor),
+            ),
+          ),
+          if (profile.nextBadgeName.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(
+              "Unlock the '${profile.nextBadgeName}' badge at Level ${profile.nextBadgeLevel}.",
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 12.5),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // ---------------- Tiêu đề "Collection Book" ----------------
+  Widget _buildCollectionBookHeader(BuildContext context) {
+    final unlockedCount = sampleCollectionBook.length;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 4),
+                child: Icon(Icons.bookmark_border, color: AppTheme.primaryColor, size: 22),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Collection\nBook',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, height: 1.15),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '$unlockedCount / $totalVietnamProvinces',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              Text('Provinces', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------- Lưới huy hiệu tỉnh/thành ----------------
+  Widget _buildCollectionBookGrid(BuildContext context) {
+    // Số ô "Locked" hiển thị thêm sau các tỉnh đã mở khoá (demo).
+    const lockedPreviewCount = 1;
+    final itemCount = sampleCollectionBook.length + lockedPreviewCount;
+
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      sliver: SliverGrid(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 0.85,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            if (index < sampleCollectionBook.length) {
+              return ProvinceBadgeCard(province: sampleCollectionBook[index]);
+            }
+            return const ProvinceBadgeCard(); // ô khoá
+          },
+          childCount: itemCount,
         ),
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.qr_code_2, color: Colors.white),
-          tooltip: 'Mã QR chia sẻ',
-          onPressed: () {},
-        ),
-      ],
+    );
+  }
+
+  // ---------------- Tiêu đề mục địa danh đã ghé ----------------
+  Widget _buildVisitedSectionHeader(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(20, 24, 20, 4),
+      child: Text(
+        'Visited Destinations',
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.primaryColor),
+      ),
     );
   }
 
@@ -65,7 +286,7 @@ class PassportScreen extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF7A2E2E), Color(0xFF9C4444)],
+          colors: [AppTheme.primaryColor, Color(0xFF15694F)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -85,7 +306,7 @@ class PassportScreen extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 32,
-                backgroundColor: Colors.white,
+                backgroundColor: AppTheme.secondaryColor,
                 backgroundImage: NetworkImage(profile.avatarUrl),
               ),
               const SizedBox(width: 14),
@@ -138,7 +359,7 @@ class PassportScreen extends StatelessWidget {
       children: [
         Text(label,
             style:
-                TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
+            TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
         const SizedBox(height: 2),
         Text(value,
             style: const TextStyle(
@@ -155,7 +376,7 @@ class PassportScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE0DACB)),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,7 +391,7 @@ class PassportScreen extends StatelessWidget {
               Text(
                 '${profile.visitedCount}/${profile.totalDestinations}',
                 style: const TextStyle(
-                    color: Color(0xFF7A2E2E), fontWeight: FontWeight.bold),
+                    color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -180,9 +401,9 @@ class PassportScreen extends StatelessWidget {
             child: LinearProgressIndicator(
               value: profile.progress,
               minHeight: 10,
-              backgroundColor: const Color(0xFFEFE9DA),
+              backgroundColor: const Color(0xFFF0F1F3),
               valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color(0xFFC79A3B)), // vàng đồng
+                  AppTheme.secondaryColor), // vàng theme chung
             ),
           ),
         ],
@@ -202,7 +423,7 @@ class PassportScreen extends StatelessWidget {
           childAspectRatio: 0.85,
         ),
         delegate: SliverChildBuilderDelegate(
-          (context, index) => StampCard(stamp: profile.stamps[index]),
+              (context, index) => StampCard(stamp: profile.stamps[index]),
           childCount: profile.stamps.length,
         ),
       ),

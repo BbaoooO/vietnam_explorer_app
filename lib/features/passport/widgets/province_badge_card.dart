@@ -1,3 +1,4 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import '../../../theme/app_theme.dart';
 import '../models/province_stamp.dart';
@@ -76,28 +77,31 @@ class ProvinceBadgeCard extends StatelessWidget {
   }
 
   // "Con dấu" tròn viền chấm — xanh nếu mở khoá, xám nếu khoá
+  // Dùng package dotted_border để ra đúng viền nét đứt như ảnh mẫu,
+  // thay cho Border.all (viền liền) trước đây.
   Widget _buildSeal(bool unlocked) {
-    return Container(
-      width: 68,
-      height: 68,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: unlocked
-            ? AppTheme.primaryColor.withOpacity(0.08)
-            : const Color(0xFFE5E7EB),
-        border: Border.all(
+    return DottedBorder(
+      borderType: BorderType.Circle,
+      color: unlocked
+          ? AppTheme.primaryColor.withOpacity(0.6)
+          : Colors.grey.shade400,
+      strokeWidth: 1.5,
+      dashPattern: const [4, 3],
+      child: Container(
+        width: 68,
+        height: 68,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
           color: unlocked
-              ? AppTheme.primaryColor.withOpacity(0.5)
-              : Colors.grey.shade400,
-          width: 1.5,
-          style: BorderStyle.solid,
+              ? AppTheme.primaryColor.withOpacity(0.08)
+              : const Color(0xFFE5E7EB),
         ),
-      ),
-      child: Icon(
-        unlocked ? Icons.account_balance : Icons.lock_outline,
-        size: 28,
-        color: unlocked ? AppTheme.primaryColor : Colors.grey.shade400,
+        child: Icon(
+          unlocked ? Icons.account_balance : Icons.lock_outline,
+          size: 28,
+          color: unlocked ? AppTheme.primaryColor : Colors.grey.shade400,
+        ),
       ),
     );
   }

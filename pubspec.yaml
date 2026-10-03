@@ -31,11 +31,19 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  google_maps_flutter: ^2.5.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
+
+  # --- Thêm cho Passport UI ---
+  dotted_border: ^2.1.0      # viền chấm quanh con dấu tỉnh thành
+  shared_preferences: ^2.3.2 # lưu Level/XP/tỉnh đã mở khoá thật (thay sample data)
+  # flutter_svg: ^2.0.10      # bật khi có file SVG icon tỉnh thành thật
+  # lottie: ^3.1.2            # bật khi có file .json animation mở khoá
+  # confetti: ^0.7.0          # bật khi làm hiệu ứng lên Level
 
 
 dev_dependencies:
