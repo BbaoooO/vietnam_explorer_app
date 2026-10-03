@@ -1,3 +1,4 @@
+import 'package:android_project/features/home/home_discover_screen.dart';
 import 'package:android_project/features/passport/passport_screen.dart';
 import 'package:flutter/material.dart';
 import 'features/planner/planner_screen.dart';
@@ -37,7 +38,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>{
 
   //Danh sách các màn hình con
   final List<Widget> _screens = [
-    const Center(child: Text('Home & Discover Screen')),
+    const HomeDiscoverScreen(),
     const InteractiveMapScreen(),
     const PlannerScreen(),
     PassportScreen(profile: sampleProfile),
