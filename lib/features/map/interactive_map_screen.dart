@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../core/models/destination_model.dart';
 import '../../core/repositories/dummy_data_repository.dart';
+import 'package:provider/provider.dart';
+import '../../core/models/planner_model.dart';
+import '../../core/providers/planner_provider.dart';
 
 class InteractiveMapScreen extends StatefulWidget {
   const InteractiveMapScreen({super.key});
@@ -377,7 +380,9 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      _showAddToItineraryDialog(context, dest);
+                    },
                     icon: const Icon(Icons.add_circle_outline),
                     label: const Text('Add to Itinerary'),
                     style: ElevatedButton.styleFrom(
@@ -431,6 +436,113 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
           ),
         ],
       ),
+    );
+  }
+  void _showAddToItineraryDialog(BuildContext context, Destination dest) {
+    int selectedDay = 0; // Mặc định chọn Ngày 1 (Index 0)
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final plannerProvider = Provider.of<PlannerProvider>(context, listen: false);
+
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Thêm "${dest.name}" vào lịch trình',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text('Chọn ngày bạn muốn ghé thăm:'),
+                  const SizedBox(height: 16),
+
+                  // Danh sách chọn Ngày
+                  Row(
+                    children: List.generate(
+                      plannerProvider.itineraries.length,
+                          (index) => Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: ChoiceChip(
+                          label: Text('Day ${index + 1}'),
+                          selected: selectedDay == index,
+                          selectedColor: primaryColor,
+                          labelStyle: TextStyle(
+                            color: selectedDay == index ? Colors.white : primaryColor,
+                          ),
+                          onSelected: (bool selected) {
+
+                            setModalState(() {
+                              selectedDay = index;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Nút Xác nhận
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
+                        // 1. Tạo một PlannerItem mới từ Destination
+                        final newItem = PlannerItem(
+                          id: DateTime.now().millisecondsSinceEpoch.toString(),
+                          time: '14:00\nPM', // Giờ mặc định
+                          title: dest.name,
+                          description: dest.subtitle,
+                          icon: dest.icon,
+                          estimatedCost: dest.entryFee,
+                          isCompleted: false,
+                        );
+
+                        // 2. Bắn dữ liệu sang Provider
+                        plannerProvider.addPlanToDay(selectedDay, newItem);
+
+                        // 3. Đóng BottomSheet và thông báo thành công
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Đã thêm ${dest.name} vào Day ${selectedDay + 1}!'),
+                            backgroundColor: primaryColor,
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Xác nhận thêm',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

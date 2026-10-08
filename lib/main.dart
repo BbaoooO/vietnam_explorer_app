@@ -4,9 +4,19 @@ import 'package:flutter/material.dart';
 import 'features/planner/planner_screen.dart';
 import 'features/passport/data/sample_passport_data.dart';
 import 'features/map/interactive_map_screen.dart';
+import 'package:provider/provider.dart';
+import 'core/providers/planner_provider.dart';
 
-void main(){
-  runApp(const VietNamExplorerApp()); // đây là tên của ứng dụng
+void main() {
+  runApp(
+    // Bọc ứng dụng bằng MultiProvider để sau này dễ thêm các Provider khác (như PassportProvider)
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => PlannerProvider()),
+      ],
+      child: const VietNamExplorerApp(),
+    ),
+  );
 }
 
 class VietNamExplorerApp extends StatelessWidget {

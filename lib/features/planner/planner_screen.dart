@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/explorer_app_bar.dart';
 import '../../core/models/planner_model.dart';
 import '../../core/repositories/dummy_data_repository.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/planner_provider.dart';
 
 class PlannerScreen extends StatefulWidget {
   const PlannerScreen({super.key});
@@ -21,7 +23,8 @@ class _PlannerScreenState extends State<PlannerScreen> {
   @override
   Widget build(BuildContext context) {
     // Gọi dữ liệu từ DummyDataRepository
-    final currentDayData = DummyDataRepository.itineraries[_selectedDayIndex];
+    final plannerProvider = context.watch<PlannerProvider>();
+    final currentDayData = plannerProvider.itineraries[_selectedDayIndex];
 
     return Scaffold(
       backgroundColor: bgColor,
