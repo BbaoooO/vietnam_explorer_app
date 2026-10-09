@@ -27,10 +27,10 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
   );
 
   static const regions = <String, String>{
-    'All': 'Cả nước',
-    'North': 'Miền Bắc',
-    'Central': 'Miền Trung',
-    'South': 'Miền Nam',
+    'All': 'All',
+    'North': 'North',
+    'Central': 'Central',
+    'South': 'South',
   };
 
   final searchController = TextEditingController();
