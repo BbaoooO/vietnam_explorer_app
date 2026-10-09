@@ -6,6 +6,7 @@ import 'features/passport/data/sample_passport_data.dart';
 import 'features/map/interactive_map_screen.dart';
 import 'package:provider/provider.dart';
 import 'core/providers/planner_provider.dart';
+import 'package:android_project/core/app_nav.dart';
 
 void main() {
   runApp(
@@ -43,50 +44,42 @@ class MainNavigationScreen extends StatefulWidget {
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
-class _MainNavigationScreenState extends State<MainNavigationScreen>{
-  int _currentIndex = 0;
-
-  //Danh sách các màn hình con
+class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _screens = [
     const HomeDiscoverScreen(),
     const InteractiveMapScreen(),
     const PlannerScreen(),
     PassportScreen(profile: sampleProfile),
-    const Center(child: Text('Profile Screen'))
+    const Center(child: Text('Profile Screen')),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF0F4C3A),
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Discover'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.map),
-              label: 'Map'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month),
-              label: 'Trip Planner'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.badge),
-              label: 'Passport'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile'),
-        ],
-      ),
+    return ValueListenableBuilder<int>(
+      valueListenable: AppNav.tab,
+      builder: (context, index, _) {
+        return Scaffold(
+          body: IndexedStack(index: index, children: _screens),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: index,
+            onTap: (i) => AppNav.tab.value = i,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: const Color(0xFF0F4C3A),
+            unselectedItemColor: Colors.grey,
+            items: const [
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.home), label: 'Discover'),
+              BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.calendar_month), label: 'Trip Planner'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.badge), label: 'Passport'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.person), label: 'Profile'),
+            ],
+          ),
+        );
+      },
     );
   }
 }

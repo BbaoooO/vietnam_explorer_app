@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:android_project/core/app_nav.dart';
 class HomeDiscoverScreen extends StatefulWidget {
   const HomeDiscoverScreen({super.key});
 
@@ -170,9 +170,12 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-          child: Column(
+        return SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+                  child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -217,7 +220,12 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
                 children: [
                   Expanded(
                     child: FilledButton.icon(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () {
+                        debugPrint('OPEN MAP pressed, id=${item.id}');
+                        Navigator.popUntil(context, (route) => route.isFirst);   // ← sửa
+                        AppNav.mapFocusId.value = item.id;
+                        AppNav.tab.value = AppNav.map;
+                      },
                       icon: const Icon(Icons.map_outlined, size: 19),
                       label: const Text('Open map'),
                       style: FilledButton.styleFrom(
@@ -233,7 +241,12 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () {
+                        debugPrint('PLAN TRIP pressed, id=${item.id}');
+                        Navigator.popUntil(context, (route) => route.isFirst);   // ← sửa
+                        AppNav.plannerAddId.value = item.id;
+                        AppNav.tab.value = AppNav.planner;
+                      },
                       icon: const Icon(Icons.event_note_rounded, size: 19),
                       label: const Text('Plan trip'),
                       style: OutlinedButton.styleFrom(
@@ -250,6 +263,8 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
               ),
             ],
           ),
+                ),
+            ),
         );
       },
     );
@@ -258,6 +273,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
   void _openExperience(_Experience item) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       showDragHandle: true,
       backgroundColor: _surface,
       shape: const RoundedRectangleBorder(
@@ -266,7 +282,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       builder: (context) {
         return SafeArea(
           top: false,
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -276,7 +292,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
                   borderRadius: BorderRadius.circular(22),
                   child: _assetImage(
                     item.image,
-                    height: 200,
+                    height: 180,
                     width: double.infinity,
                   ),
                 ),
@@ -316,6 +332,22 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    AppNav.tab.value = AppNav.planner;
+                  },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: _primary,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size.fromHeight(48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: const Text('Add to planner'),
+                ),
               ],
             ),
           ),
@@ -323,7 +355,6 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       },
     );
   }
-
   void _showAllDestinations() {
     showModalBottomSheet(
       context: context,
@@ -450,7 +481,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFE7F0EC),
+git               color: const Color(0xFFE7F0EC),
               borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(
@@ -925,43 +956,40 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
   Widget _travelNote() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-      child: Container(
-        padding: const EdgeInsets.all(17),
-        decoration: BoxDecoration(
-          color: const Color(0xFFE8F1ED),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: const Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Travel deeper',
-                    style: TextStyle(
-                      color: _primaryDark,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () => AppNav.tab.value = AppNav.passport,
+        child: Container(
+          padding: const EdgeInsets.all(17),
+          decoration: BoxDecoration(
+            color: const Color(0xFFE8F1ED),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Travel deeper',
+                      style: TextStyle(
+                        color: _primaryDark,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 3),
-                  Text(
-                    'Discover Vietnam at your own pace.',
-                    style: TextStyle(
-                      color: _muted,
-                      fontSize: 10.5,
+                    SizedBox(height: 3),
+                    Text(
+                      'Discover Vietnam at your own pace.',
+                      style: TextStyle(color: _muted, fontSize: 10.5),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Icon(
-              Icons.arrow_forward_rounded,
-              color: _primary,
-              size: 21,
-            ),
-          ],
+              Icon(Icons.arrow_forward_rounded, color: _primary, size: 21),
+            ],
+          ),
         ),
       ),
     );
