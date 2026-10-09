@@ -481,7 +481,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-git               color: const Color(0xFFE7F0EC),
+              color: const Color(0xFFE7F0EC),
               borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(
