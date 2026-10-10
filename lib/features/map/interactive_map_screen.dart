@@ -17,7 +17,8 @@ class InteractiveMapScreen extends StatefulWidget {
 
 class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
   static const green = Color(0xFF0F4C3A);
-  static const mapsBlue = Color(0xFF1A73E8);
+  static const mapsBlue = green;
+  static const gold = Color(0xFFF2B705);
   static const detailZoom = 12.0;
 
   static final vnBounds = LatLngBounds(
@@ -527,9 +528,11 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                 OutlinedButton.icon(
                   onPressed: () {},
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: mapsBlue,
+                    foregroundColor: green,
+                    backgroundColor: gold.withValues(alpha: 0.16),
                     side: const BorderSide(
-                      color: mapsBlue,
+                      color: green,
+                      width: 1.2,
                     ),
                     shape: const StadiumBorder(),
                     padding: const EdgeInsets.symmetric(
@@ -541,7 +544,12 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                     Icons.bookmark_border,
                     size: 20,
                   ),
-                  label: const Text('Lưu'),
+                  label: const Text(
+                    'Lưu',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
 
                 const SizedBox(height: 16),
@@ -574,13 +582,27 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     required VoidCallback onPressed,
     Color color = green,
   }) {
+    final isBookmark =
+        icon == Icons.bookmark ||
+            icon == Icons.bookmark_border ||
+            icon == Icons.bookmark_outline;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: FloatingActionButton.small(
         heroTag: tag,
         tooltip: tooltip,
-        backgroundColor: Colors.white,
+        backgroundColor:
+        isBookmark ? const Color(0xFFFFF4D0) : Colors.white,
         foregroundColor: color,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(
+            color: green,
+            width: 1,
+          ),
+        ),
         onPressed: onPressed,
         child: Icon(icon, size: 22),
       ),
