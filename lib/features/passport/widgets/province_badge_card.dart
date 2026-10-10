@@ -21,7 +21,7 @@ class ProvinceBadgeCard extends StatelessWidget {
           color: unlocked ? const Color(0xFFE5E7EB) : const Color(0xFFE5E7EB),
         ),
       ),
-      child: Stack(
+      child: Stack(alignment: Alignment.center,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),

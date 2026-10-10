@@ -21,11 +21,11 @@ class PassportScreen extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: _buildAppBar(context)),
+          SliverToBoxAdapter(child: _buildPassportCard(context)),
           SliverToBoxAdapter(child: _buildHeader(context)),
           SliverToBoxAdapter(child: _buildLevelCard(context)),
           SliverToBoxAdapter(child: _buildCollectionBookHeader(context)),
           _buildCollectionBookGrid(context),
-          SliverToBoxAdapter(child: _buildPassportCard(context)),
           SliverToBoxAdapter(child: _buildProgressSection(context)),
           SliverToBoxAdapter(child: _buildVisitedSectionHeader(context)),
           _buildStampsGrid(context),
