@@ -14,7 +14,6 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
   static const Color _surface = Colors.white;
   static const Color _primary = Color(0xFF0F4C3A);
   static const Color _primaryDark = Color(0xFF073B2F);
-  static const Color _soft = Color(0xFFE3EEE9);
   static const Color _text = Color(0xFF18201D);
   static const Color _muted = Color(0xFF69736E);
   static const Color _line = Color(0xFFE2E7E4);
@@ -672,7 +671,6 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
           slivers: [
             SliverToBoxAdapter(child: _buildHeader()),
             SliverToBoxAdapter(child: _buildSearch()),
-            SliverToBoxAdapter(child: _buildQuickActions()),
             SliverToBoxAdapter(child: _buildHero()),
             SliverToBoxAdapter(
               child: _sectionHeader(
@@ -720,13 +718,17 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
                   children: [
                     Icon(Icons.location_on_rounded, color: _primary, size: 17),
                     SizedBox(width: 3),
-                    Text(
-                      'Hanoi, Vietnam',
-                      style: TextStyle(
-                        color: _text,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.2,
+                    Flexible(
+                      child: Text(
+                        'Hanoi, Vietnam',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: _text,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.2,
+                        ),
                       ),
                     ),
                   ],
@@ -752,11 +754,46 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
               ],
             ),
           ),
+          const SizedBox(width: 8),
+          InkWell(
+            onTap: () => _showDestinationsSheet('Saved places', _savedDestinations),
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+              decoration: BoxDecoration(
+                color: _surface,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: _line),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    _favorites.isEmpty
+                        ? Icons.favorite_border_rounded
+                        : Icons.favorite_rounded,
+                    size: 18,
+                    color: _favorites.isEmpty ? _primary : _stamp,
+                  ),
+                  if (_favorites.isNotEmpty) ...[
+                    const SizedBox(width: 4),
+                    Text(
+                      '${_favorites.length}',
+                      style: const TextStyle(
+                        color: _text,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
-
   Widget _buildSearch() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
@@ -791,58 +828,6 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(18),
             borderSide: const BorderSide(color: _primary, width: 1.3),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // --------------------------------------------------------- quick actions
-
-  Widget _buildQuickActions() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-      child: Row(
-        children: [
-          _quickAction(Icons.map_rounded, 'Map', () => AppNav.tab.value = AppNav.map),
-          _quickAction(Icons.calendar_month_rounded, 'Planner', () => AppNav.tab.value = AppNav.planner),
-          _quickAction(Icons.badge_rounded, 'Passport', () => AppNav.tab.value = AppNav.passport),
-          _quickAction(
-            _favorites.isEmpty ? Icons.favorite_border_rounded : Icons.favorite_rounded,
-            _favorites.isEmpty ? 'Saved' : 'Saved (${_favorites.length})',
-                () => _showDestinationsSheet('Saved places', _savedDestinations),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _quickAction(IconData icon, String label, VoidCallback onTap) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Column(
-            children: [
-              Container(
-                width: 54,
-                height: 54,
-                decoration: BoxDecoration(
-                  color: _soft,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Icon(icon, color: _primary, size: 25),
-              ),
-              const SizedBox(height: 7),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: _text, fontSize: 12, fontWeight: FontWeight.w600),
-              ),
-            ],
           ),
         ),
       ),
