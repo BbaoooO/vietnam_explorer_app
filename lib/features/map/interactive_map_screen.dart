@@ -33,12 +33,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     'Central': 'Central',
     'South': 'South',
   };
-  static const _regionIcons = {
-    'All': Icons.explore_outlined,
-    'North': Icons.landscape_outlined,
-    'Central': Icons.temple_buddhist_outlined,
-    'South': Icons.wb_sunny_outlined,
-  };
 
   final searchController = TextEditingController();
   final iconCache = <String, BitmapDescriptor>{};
