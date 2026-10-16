@@ -4,7 +4,7 @@ import '../models/destination_model.dart';
 import '../models/planner_model.dart';
 
 class DummyDataRepository {
-  // Kho dữ liệu cho Interactive Map
+  // Data repository for Interactive Map
   static final List<Destination> destinations = [
     Destination(
       id: '1',
@@ -64,7 +64,7 @@ class DummyDataRepository {
     ),
   ];
 
-  // Kho dữ liệu cho Trip Planner
+  // Data repository for Trip Planner
   static final List<DailyItinerary> itineraries = [
     DailyItinerary(
       day: 1,
@@ -73,27 +73,27 @@ class DummyDataRepository {
         PlannerItem(
           id: '1',
           time: '08:00\nAM',
-          title: 'Đến Sân bay Nội Bài',
-          description: 'Di chuyển về khách sạn trung tâm phố cổ bằng taxi.',
+          title: 'Arrive at Noi Bai Airport',
+          description: 'Transfer to the Old Quarter hotel by taxi.',
           icon: Icons.flight_land,
-          estimatedCost: '350,000đ',
+          estimatedCost: '350,000 VND',
           isCompleted: true,
         ),
         PlannerItem(
           id: '2',
           time: '10:30\nAM',
-          title: 'Phở Gia Truyền Bát Đàn',
-          description: 'Thưởng thức phở bò đặc trưng Hà Nội.',
+          title: 'Bat Dan Traditional Pho',
+          description: 'Enjoy the signature Hanoi beef pho.',
           icon: Icons.restaurant,
-          estimatedCost: '60,000đ',
+          estimatedCost: '60,000 VND',
         ),
         PlannerItem(
           id: '3',
           time: '02:00\nPM',
-          title: 'Văn Miếu Quốc Tử Giám',
-          description: 'Tham quan trường đại học đầu tiên của Việt Nam.',
+          title: 'Temple of Literature',
+          description: 'Visit the first university of Vietnam.',
           icon: Icons.account_balance,
-          estimatedCost: '30,000đ',
+          estimatedCost: '30,000 VND',
         ),
       ],
     ),
@@ -104,18 +104,18 @@ class DummyDataRepository {
         PlannerItem(
           id: '4',
           time: '07:00\nAM',
-          title: 'Khởi hành đi Ninh Bình',
-          description: 'Lên xe Limousine tại điểm hẹn Nhà Hát Lớn.',
+          title: 'Depart for Ninh Binh',
+          description: 'Take a Limousine bus at the Hanoi Opera House.',
           icon: Icons.directions_bus,
-          estimatedCost: '250,000đ',
+          estimatedCost: '250,000 VND',
         ),
         PlannerItem(
           id: '5',
           time: '09:30\nAM',
-          title: 'Quần thể danh thắng Tràng An',
-          description: 'Đi đò ngắm cảnh núi non hùng vĩ (Tuyến 3).',
+          title: 'Trang An Scenic Landscape Complex',
+          description: 'Take a boat ride to admire majestic mountains (Route 3).',
           icon: Icons.sailing,
-          estimatedCost: '250,000đ',
+          estimatedCost: '250,000 VND',
         ),
       ],
     ),
@@ -126,10 +126,10 @@ class DummyDataRepository {
         PlannerItem(
           id: '6',
           time: '09:00\nAM',
-          title: 'Mua sắm chợ Đồng Xuân',
-          description: 'Mua quà lưu niệm và đặc sản địa phương.',
+          title: 'Shopping at Dong Xuan Market',
+          description: 'Buy souvenirs and local specialties.',
           icon: Icons.shopping_bag,
-          estimatedCost: 'Tùy chọn',
+          estimatedCost: 'Optional',
         ),
       ],
     ),
