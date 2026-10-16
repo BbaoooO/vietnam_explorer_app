@@ -2,7 +2,9 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'data/favorite_place_store.dart';
 import 'data/tourism_places.dart';
 import 'widgets/place_photo.dart';
 import 'widgets/place_visit_panel.dart';
@@ -17,23 +19,25 @@ class InteractiveMapScreen extends StatefulWidget {
 
 class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
   static const green = Color(0xFF0F4C3A);
-  static const mapsBlue = green;
-  static const gold = Color(0xFFF2B705);
+  static const mapsBlue = Color(0xFF1A73E8);
   static const detailZoom = 12.0;
-
   static final vnBounds = LatLngBounds(
     southwest: const LatLng(8, 102),
     northeast: const LatLng(24, 118),
   );
 
   static const regions = <String, String>{
-    'All': 'All',
-    'North': 'North',
-    'Central': 'Central',
-    'South': 'South',
+    'All': 'Cả nước',
+    'North': 'Miền Bắc',
+    'Central': 'Miền Trung',
+    'South': 'Miền Nam',
   };
 
   final searchController = TextEditingController();
+  final store = FavoritePlaceStore.instance;
+  final saved = <String>{};
+  final saving = <String>{};
+  final favoriteRevision = ValueNotifier<int>(0);
   final iconCache = <String, BitmapDescriptor>{};
 
   GoogleMapController? map;
@@ -43,12 +47,21 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
   double zoom = 5.2;
   String region = 'All';
 
+  bool savedReady = false;
+  bool loadingSaved = false;
   int markerVersion = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    loadSaved();
+  }
 
   @override
   void dispose() {
     markerVersion++;
     searchController.dispose();
+    favoriteRevision.dispose();
     map?.dispose();
     super.dispose();
   }
@@ -168,12 +181,123 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
 
   // lưu yêu thích
 
-  // đổi trạng thái khi luư vào sql lite
+  Future<void> loadSaved() async {
+    if (loadingSaved) return;
+
+    setState(() => loadingSaved = true);
+
+    try {
+      await store.database;
+      try {
+        final prefs = await SharedPreferences.getInstance();
+
+        final oldIds = (
+            prefs.getStringList('raw_map_saved') ?? <String>[]
+        ).toSet();
+
+        await store.migrateLegacyPlaces(
+          tourismPlaces
+              .where((place) => oldIds.contains(place.id))
+              .toList(),
+        );
+      } catch (_) {
+        message(
+          'Chưa chuyển được yêu thích cũ. '
+              'Thử mở lại ứng dụng sau.',
+        );
+      }
+
+      final ids = await store.readIds();
+
+      if (!mounted) return;
+
+      setState(() {
+        saved
+          ..clear()
+          ..addAll(ids);
+
+        savedReady = true;
+      });
+    } catch (_) {
+      message(
+        'Chưa mở được SQLite. Bấm nút thử lại ở thanh phía trên.',
+      );
+    } finally {
+      if (mounted) {
+        setState(() => loadingSaved = false);
+        favoriteRevision.value++;
+      }
+    }
+  }
+
+  Future<void> toggleSaved(TourismPlace place) async {
+    if (!savedReady || saving.contains(place.id)) return;
+
+    final wasSaved = saved.contains(place.id);
+
+    setState(() => saving.add(place.id));
+    favoriteRevision.value++;
+
+    try {
+      if (wasSaved) {
+        await store.remove(place.id);
+      } else {
+        await store.save(place);
+      }
+
+      if (!mounted) return;
+
+      // đổi trạng thái khi luư vào sql lite
+      setState(() {
+        if (wasSaved) {
+          saved.remove(place.id);
+        } else {
+          saved.add(place.id);
+        }
+      });
+
+      message(
+        wasSaved
+            ? 'Đã bỏ địa điểm khỏi danh sách đã lưu.'
+            : 'Đã lưu địa điểm.',
+      );
+    } catch (_) {
+      message('Chưa lưu được thay đổi. Hãy thử lại.');
+    } finally {
+      if (mounted) {
+        setState(() => saving.remove(place.id));
+        favoriteRevision.value++;
+      }
+    }
+  }
+
+  void showFavorites() {
+    hideKeyboard();
+
+    if (!savedReady) {
+      message(
+        'Danh sách đã lưu chưa sẵn sàng. '
+            'Bấm thử lại ở thanh phía trên.',
+      );
+      return;
+    }
+
+    final places = tourismPlaces
+        .where((place) => saved.contains(place.id))
+        .toList();
+
+    showPlacesList(
+      places,
+      title: 'Địa điểm đã lưu',
+      fromFavorites: true,
+    );
+  }
 
   // Dùng cho kết quả tìm kiếm và danh sách đã lưu.
   void showPlacesList(
       List<TourismPlace> places, {
         required String title,
+        bool fromFavorites = false,
       }) {
     showModalBottomSheet<void>(
       context: context,
@@ -194,7 +318,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
             Expanded(
               child: places.isEmpty
                   ? const Center(
-                child: Text('Không có địa điểm phù hợp.'),
+                child: Text('Chưa lưu địa điểm nào.'),
               )
                   : ListView.builder(
                 itemCount: places.length,
@@ -213,6 +337,16 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                     ),
                     onTap: () async {
                       Navigator.pop(sheetContext);
+
+                      if (fromFavorites) {
+                        markerVersion++;
+
+                        setState(() {
+                          searchController.clear();
+                          region = place.region;
+                          markers = {};
+                        });
+                      }
 
                       await map?.animateCamera(
                         CameraUpdate.newLatLngZoom(
@@ -498,66 +632,79 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (sheetContext) => SafeArea(
-        child: SizedBox(
-          height: MediaQuery.of(sheetContext).size.height * .8,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                PlacePhoto(place: place),
-                const SizedBox(height: 12),
-                Text(
-                  place.name,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '${place.province} · '
-                      '${categoryLabel(place.category)}',
-                ),
-                const SizedBox(height: 8),
-                Text(place.description),
-                const SizedBox(height: 14),
+      builder: (sheetContext) => ValueListenableBuilder<int>(
+        valueListenable: favoriteRevision,
+        builder: (sheetContext, revision, child) {
+          final isSaved = saved.contains(place.id);
+          final isSaving = saving.contains(place.id);
 
-                // nút lưu yêu thích
-                OutlinedButton.icon(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: green,
-                    backgroundColor: gold.withValues(alpha: 0.16),
-                    side: const BorderSide(
-                      color: green,
-                      width: 1.2,
+          return SafeArea(
+            child: SizedBox(
+              height: MediaQuery.of(sheetContext).size.height * .8,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    PlacePhoto(place: place),
+                    const SizedBox(height: 12),
+                    Text(
+                      place.name,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
+                    const SizedBox(height: 6),
+                    Text(
+                      '${place.province} · '
+                          '${categoryLabel(place.category)}',
                     ),
-                  ),
-                  icon: const Icon(
-                    Icons.bookmark_border,
-                    size: 20,
-                  ),
-                  label: const Text(
-                    'Lưu',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+                    const SizedBox(height: 8),
+                    Text(place.description),
+                    const SizedBox(height: 14),
 
-                const SizedBox(height: 16),
-                PlaceVisitPanel(placeId: place.id),
-              ],
+                    // nút lưu yêu thích
+                    OutlinedButton.icon(
+                      onPressed: !savedReady || isSaving
+                          ? null
+                          : () => toggleSaved(place),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: mapsBlue,
+                        side: const BorderSide(
+                          color: mapsBlue,
+                        ),
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                      icon: Icon(
+                        isSaved
+                            ? Icons.bookmark
+                            : Icons.bookmark_border,
+                        size: 20,
+                      ),
+                      label: Text(
+                        !savedReady
+                            ? 'Đang tải…'
+                            : isSaving
+                            ? 'Đang lưu…'
+                            : isSaved
+                            ? 'Đã lưu'
+                            : 'Lưu',
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+                    PlaceVisitPanel(placeId: place.id),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -582,27 +729,13 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     required VoidCallback onPressed,
     Color color = green,
   }) {
-    final isBookmark =
-        icon == Icons.bookmark ||
-            icon == Icons.bookmark_border ||
-            icon == Icons.bookmark_outline;
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: FloatingActionButton.small(
         heroTag: tag,
         tooltip: tooltip,
-        backgroundColor:
-        isBookmark ? const Color(0xFFFFF4D0) : Colors.white,
+        backgroundColor: Colors.white,
         foregroundColor: color,
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: const BorderSide(
-            color: green,
-            width: 1,
-          ),
-        ),
         onPressed: onPressed,
         child: Icon(icon, size: 22),
       ),
@@ -664,6 +797,16 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                       ),
                     ),
                   ),
+                  if (!savedReady)
+                    IconButton(
+                      tooltip: 'Thử tải danh sách đã lưu',
+                      onPressed: loadingSaved ? null : loadSaved,
+                      icon: Icon(
+                        loadingSaved
+                            ? Icons.hourglass_top
+                            : Icons.refresh,
+                      ),
+                    ),
                 ],
               ),
               const SizedBox(height: 6),
@@ -759,7 +902,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                       tooltip: 'Địa điểm đã lưu',
                       icon: Icons.bookmark,
                       color: mapsBlue,
-                      onPressed: () {},
+                      onPressed: showFavorites,
                     ),
                     mapButton(
                       tag: 'map:zoomIn',
