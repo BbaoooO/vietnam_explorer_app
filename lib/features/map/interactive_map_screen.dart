@@ -84,7 +84,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
         _recentIds.addAll(preferences.getStringList(_recentKey) ?? []);
       });
     } catch (_) {
-      // Map browsing remains available if local preferences are unavailable.
     }
   }
 
@@ -105,7 +104,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
       final preferences = await SharedPreferences.getInstance();
       await preferences.setStringList(_recentKey, List.of(_recentIds));
     } catch (_) {
-      // Keep history available for the current session.
     }
   }
 
