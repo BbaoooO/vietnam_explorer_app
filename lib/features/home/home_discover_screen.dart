@@ -1,47 +1,60 @@
 import 'package:android_project/core/app_nav.dart';
 import 'package:flutter/material.dart';
+//nạp lớp điều bộ appNav & thư viện giao diện Material
 
-class HomeDiscoverScreen extends StatefulWidget {
+class HomeDiscoverScreen extends StatefulWidget
+//Home kế thừa StatefulWidget vì màn hình có trạng thái thay đổi: từ khóa
+//bộ lọc, ảnh hiện tại, yêu thích
+{
   const HomeDiscoverScreen({super.key});
-
+  //constructor tạo màn hinhf, super.key truyền lên key lớp cha,
+  //key hỗ trọ Flutter nhận diện Widget khi cập nhật cây giao diện, constructor const khong có nghĩa trạng thái màn hình không thay đổi
   @override
-  State<HomeDiscoverScreen> createState() => _HomeDiscoverScreenState();
+  State<HomeDiscoverScreen> createState() => _HomeDiscoverScreenState();//createState() tạo đối tượng giữ trạng thái cho Home
 }
-
-class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
-  // Palette: ngọc bích + đỏ con dấu hộ chiếu + nền giấy xám nhạt
+class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này chứa dữ liệu trạng thái, các hàm xử lý và hàm build()
+{
+  // màu sắc, controller và biến trang thái
   static const Color _background = Color(0xFFF4F6F4);
   static const Color _surface = Colors.white;
   static const Color _primary = Color(0xFF0F4C3A);
   static const Color _primaryDark = Color(0xFF073B2F);
-  static const Color _text = Color(0xFF18201D);
-  static const Color _muted = Color(0xFF69736E);
+  static const Color _text = Color(0xFF18201D);// _text chữ chính
+  static const Color _muted = Color(0xFF69736E); //_muted chữ phụ
   static const Color _line = Color(0xFFE2E7E4);
-  static const Color _gold = Color(0xFFE6A524);
-  static const Color _stamp = Color(0xFFB3362E);
+  static const Color _gold = Color(0xFFE6A524); //_gold màu sao đánh giá
+  static const Color _stamp = Color(0xFFB3362E); //_stamp màu đỏ của dấu và trái tim đã chọn
 
   final TextEditingController _searchController = TextEditingController();
+  //quản lý nội dung ô nhập _searchController.clear() xóa chữ đang hiển thị
   final PageController _heroController = PageController(viewportFraction: 0.9);
+  //điều khiển pageview mỗi trang chiếm 90% chiều rộng vùng xem, giúp lộ một phần ảnh kế tiếp
+  //và gợi ý thao tác vuốt
 
-  String _query = '';
-  String _selectedRegion = 'All';
-  int _heroIndex = 0;
+  String _query = ''; //ban đầu chưa nhập từ khóa
+  String _selectedRegion = 'All'; //chưa giới hạn khu vực
+  int _heroIndex = 0; //ảnh đầu tiên có chỉ số bằng 0
   final Set<String> _favorites = <String>{};
+  //tạo tập hợp mã địa điểm yêu thích rỗng
+  //final vẫn thêm xóa sửa được , final ngăn gán _favorites sang tập hợp khác, nhưng không ngăn thay đổi của tập hợp hiện tại
   final List<String> _regions = const <String>['All', 'North', 'Central', 'South'];
+  //danh sách nhãn dùng để tạo các nút lọc. Danh sách const khong the thêm,sua,xóa phần tử
 
-  final List<_Destination> _destinations = const <_Destination>[
+  final List<_Destination> _destinations = const <_Destination>
+  //khai báo dữ liệu địa điểm và trải nghiệm
+  [
     // ======================= NORTH =======================
     _Destination(
       id: 'hanoi',
       title: 'Hanoi',
-      subtitle: 'Culture & old streets',
-      region: 'North',
+      subtitle: 'Culture & old streets', //đặc điểm nổi bật trình bày ngắn
+      region: 'North', //khu vực dùng để lọc
       image: 'assets/images/hanoi.jpg',
       rating: 4.9,
       description:
       'Walk around Hoan Kiem Lake, eat bun cha in the Old Quarter and watch the city wake up over a cup of egg coffee.',
       bestTime: 'Sep - Nov',
-      duration: '3 days',
+      duration: '3 days', //thời lượng chuyến đi gợi ý
       budget: '800k/day',
     ),
     _Destination(
@@ -320,6 +333,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       bestTime: 'Jun - Aug',
       duration: '2 days',
       budget: '550k/day',
+      //budget hiện chỉ là chuỗi, nên không trực tiếp cộng với ngân sách khác
     ),
   ];
 
@@ -331,6 +345,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       duration: '2 days',
       image: 'assets/images/halong.jpg',
     ),
+    //mỗi trải nghiệm có tên, mô tả, thời lượng và ảnh
     _Experience(
       title: 'Lantern Night Walk',
       subtitle: 'A calm evening in Hoi An',
@@ -349,64 +364,88 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
   static const List<String> _featuredIds = <String>['halong', 'hoian', 'sapa'];
 
   List<_Destination> get _featured =>
+  //get__featured getter trả về danh sách địa điểm nổi bật
       _featuredIds.map((id) => _destinations.firstWhere((d) => d.id == id)).toList();
-
-  List<_Destination> get _filteredDestinations {
+//_featuredIds.map duyệt tùng mã và biến mã thành một đối tượng địa điểm
+  //firstWhere (....) tìm địa đầu tiên có d.id ==id
+  //toList: chuyền kết quả thành list
+  //nếu mã không tồn tại, fistWhere() sẽ báo lỗi vì chưa có orElse. Cần đảm bảo các mã nổi bật
+  //hợp lệ hoặc bổ sung xử lý trường hợp thiếu
+  List<_Destination> get _filteredDestinations
+  //getter tao danh sách phù hợp với lựa chọn hiện tại
+  {
     final q = _query.trim().toLowerCase();
-    return _destinations.where((item) {
+    return _destinations.where((item)
+    //duyệt địa điểm và chỉ giữ phần tử thỏa điều kiện
+    {
       final regionMatch = _selectedRegion == 'All' || item.region == _selectedRegion;
+      //địa điểm đạt điều kiện khu vực nếu: Chọn All hoặc khu vực địa điểm trùng khu vực đã chọn
       final queryMatch = q.isEmpty ||
           item.title.toLowerCase().contains(q) ||
           item.subtitle.toLowerCase().contains(q) ||
           item.region.toLowerCase().contains(q);
-      return regionMatch && queryMatch;
-    }).toList();
+      //đạt điều kiện tìm kiếm nếu từ khóa rỗng hoặc xuất hiện trong ít nhất 1 trường: tên, mô tả ngắn, khu vực
+      return regionMatch && queryMatch;//điều kiện phải thỏa cả 2 điều kiện
+    }).toList();//chuyển kết quả lọc thành danh sách
   }
-
+  //danh sách yêu thích
   List<_Destination> get _savedDestinations =>
       _destinations.where((d) => _favorites.contains(d.id)).toList();
-
+  // duyệt dữ liệu điểm đến, kiểm tra mã có trong _favorites không=> trả về địa điểm đã chọn
+  //thứ tự kết quả theo _destinations, không theo tgian người dùng nhấn lưu
   @override
-  void dispose() {
+  void dispose() //dispose() được gọi khi đôí tượng State bị hủy
+  {
     _searchController.dispose();
     _heroController.dispose();
-    super.dispose();
+    //hai controller được giải phóng tài nguyên
+    super.dispose(); //gọi xử lý của lớp cha
   }
 
-  void _toggleFavorite(String id) {
-    setState(() {
+  void _toggleFavorite(String id)
+  //_toggleFavorite(..) hàm nhận mã địa điểm, không trả về giá trị
+  {
+    setState(() // thay đổi trạng thái và yêu cầu flutter cập nhật giao diên
+    {
       if (!_favorites.remove(id)) _favorites.add(id);
+      //favorite_remove(id) thử xóa mã trả về true nếu mã đã tồn tại và được xóa
+      //favorite_add(id) nếu chưa có mã để xóa thì thêm mã vào
     });
   }
 
+//xóa bộ lộc và giải phóng controler
   void _resetFilters() {
     setState(() {
-      _query = '';
-      _selectedRegion = 'All';
-      _searchController.clear();
+      _query = ''; //xóa từ khóa dùng trong logic
+      _selectedRegion = 'All'; //trả khu vực về All
+      _searchController.clear(); //xóa chữ đang hiện trong ô nhập
     });
   }
-
-  // ---------------------------------------------------------------- sheets
-
-  void _openDestination(_Destination item) {
+  // Bảng chi tiết địa điểm
+  void _openDestination(_Destination item) //nhận đối tượng địa điểm người dùng chọn
+  {
     showModalBottomSheet(
-      context: context,
-      useSafeArea: true,
-      isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: _surface,
+      context: context, //cho flutter biết vị trí cây widget để mở bảng
+      useSafeArea: true, //tránh vùng hệ thống ở phía trên và hai bên bảng
+      isScrollControlled: true, //cho phép bảng có chiều cao linh hoạt hơn, phù hợp với ndung cuộn
+      showDragHandle: true, //hiển thị thanh kéo nhỏ phía trên
+      backgroundColor: _surface,//nền bàng
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (context) {
-        return SafeArea(
+      ), //bo 2 góc trên
+      builder: (context) //hàm tạo nội dung trong bảng
+      {
+        return SafeArea //tiếp tục xử lý vùng an toàn, bỏ phần trên
+          (
           top: false,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+          child: SingleChildScrollView //cho phép cuộn nêú nội dung dài
+            (
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 20), //khoảng đệm: trái 20, trên 4,phải 20, dưới 20
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
+              //xếp nội dung theo chiều dọc, chiếm chiều cao theo giới hạn bố cục
+              //căn các phần tử về đầu trục ngang, thường là bên trái
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(24),
@@ -414,7 +453,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
                     height: 210,
                     width: double.infinity,
                     child: _assetImage(item.image),
-                  ),
+                  ), //tạo ảnh cao 210, rộng theo vùng có sẵn và cắt ảnh theo bo góc
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -441,9 +480,9 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
                               const SizedBox(width: 3),
                               Expanded(
                                 child: Text(
-                                  '${item.subtitle}, ${item.region}',
+                                  '${item.subtitle}, ${item.region}',//ghép mô tả ngắn với khu vực
                                   maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                  overflow: TextOverflow.ellipsis, //giới hạn 1 dòng, nếu thiếu chỗ thì hiển tị dấu..
                                   style: const TextStyle(color: _muted, fontSize: 13),
                                 ),
                               ),
@@ -464,11 +503,11 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
                     _infoTile(Icons.schedule_rounded, 'Suggested', item.duration),
                     const SizedBox(width: 8),
                     _infoTile(Icons.payments_outlined, 'Budget', item.budget),
-                  ],
+                  ], //tạo 3 ô thông tin bằng cùng một hàm, khác biểu tượng, nhãn và giá trị
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  item.description,
+                  item.description, //hiển thị mô tả dài
                   style: const TextStyle(color: _text, fontSize: 14.5, height: 1.55),
                 ),
                 const SizedBox(height: 20),
@@ -476,10 +515,12 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
                   children: [
                     Expanded(
                       child: FilledButton.icon(
-                        onPressed: () {
-                          Navigator.popUntil(context, (route) => route.isFirst);
-                          AppNav.mapFocusId.value = item.id;
-                          AppNav.tab.value = AppNav.map;
+                        onPressed: () //nút open map
+                        {
+                          Navigator.popUntil(context, (route) => route.isFirst);//đóng các route phia trên đến route đầu tiên của Navigator đang được sd
+                          AppNav.mapFocusId.value = item.id;//gửi mã địa điểm
+                          AppNav.tab.value = AppNav.map; //gửi yêu cầu chuyển tab map
+                          //popUntil có thể đóng cả danh sách và bảng chi tiết nếu 2 bảng đang mở chồng nhau.
                         },
                         icon: const Icon(Icons.map_outlined, size: 19),
                         label: const Text('Open map'),
@@ -496,8 +537,9 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
                       child: OutlinedButton.icon(
                         onPressed: () {
                           Navigator.popUntil(context, (route) => route.isFirst);
-                          AppNav.plannerAddId.value = item.id;
+                          AppNav.plannerAddId.value = item.id; //nút plan trip
                           AppNav.tab.value = AppNav.planner;
+                          //gửi mã sang Planner & yêu cầu chuyển tab
                         },
                         icon: const Icon(Icons.event_note_rounded, size: 19),
                         label: const Text('Plan trip'),
@@ -518,8 +560,9 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       },
     );
   }
-
-  void _openExperience(_Experience item) {
+//chi tiết trải nghiệm
+  void _openExperience(_Experience item) //_openExperience() tạo bottom Sheet
+  {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -574,8 +617,8 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
                 const SizedBox(height: 18),
                 FilledButton(
                   onPressed: () {
-                    Navigator.pop(context);
-                    AppNav.tab.value = AppNav.planner;
+                    Navigator.pop(context); //đóng bảng hiện tại
+                    AppNav.tab.value = AppNav.planner;//dòng sau chuyển tab
                   },
                   style: FilledButton.styleFrom(
                     backgroundColor: _primary,
@@ -592,8 +635,9 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       },
     );
   }
-
-  void _showDestinationsSheet(String title, List<_Destination> list) {
+//bảng view all và saved places
+  void _showDestinationsSheet(String title, List<_Destination> list) //1 hàm dùng cho 2 mục đích khác nhau bằng cách truyền tiêu đề và ds khác nhau
+  {
     showModalBottomSheet(
       context: context,
       useSafeArea: true,
@@ -605,11 +649,12 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       ),
       builder: (context) {
         return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.88,
+          expand: false, //không tự chiếm toàn bộ vùng bố cục cha
+          initialChildSize: 0.88, //mở đầu 88% chiều cao vùng cha
           minChildSize: 0.55,
           maxChildSize: 0.96,
-          builder: (context, scrollController) {
+          builder: (context, scrollController) //cung cấp controller để phối hợp thao tác cuộn bẳng và cuộn ds
+          {
             return Column(
               children: [
                 Padding(
@@ -640,16 +685,17 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
                     ),
                   )
                       : GridView.builder(
-                    controller: scrollController,
+                    controller: scrollController,//gắn controller của bảng
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                    itemCount: list.length,
+                    itemCount: list.length, // xác định số phần tử
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 14,
+                      crossAxisCount: 2, //2 cột
+                      mainAxisSpacing: 14, //khoảng cách giữa hàng và cột là 14
                       crossAxisSpacing: 14,
-                      childAspectRatio: 0.72,
+                      childAspectRatio: 0.72, //tỉ lệ chiều rộng/chiều cao thẻ là 0,72 nên thẻ cao rộng hơn
                     ),
                     itemBuilder: (context, index) => _destinationCard(list[index]),
+                    //lấy phần tử ở vị trí index và tạo thẻ tương ứng
                   ),
                 ),
               ],
@@ -665,21 +711,24 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
   @override
   Widget build(BuildContext context) {
     final destinations = _filteredDestinations;
+    //mỗi lần build, lấy danh sách phù hợp với từ khóa và khu vực hiện tại
 
     return Scaffold(
-      backgroundColor: _background,
-      body: SafeArea(
+      backgroundColor: _background, //tạo khung màn hình và đặt nền
+      body: SafeArea( //bảo vệ khỏi vùng hệ thống, nhưng không chừa vùng an toàn phía dưới tại đây
         bottom: false,
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            SliverToBoxAdapter(child: _buildHeader()),
+        child: CustomScrollView //tạo màn hình cuộn dọc
+          (
+          physics: const BouncingScrollPhysics(), //hiệu ứng nhảy khi kéo vượt biên
+          slivers: //các phần tử trong vùng cuộn
+          [
+            SliverToBoxAdapter(child: _buildHeader()),//đưa 1 widget thông thường vào CustomScrollView
             SliverToBoxAdapter(child: _buildSearch()),
             SliverToBoxAdapter(child: _buildHero()),
             SliverToBoxAdapter(
               child: _sectionHeader(
                 title: 'Popular destinations',
-                action: 'View all',
+                action: 'View all', //nhận danh sách gốc không phải danh sách đã lọc
                 onAction: () => _showDestinationsSheet('All destinations', _destinations),
               ),
             ),
@@ -688,6 +737,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
               child: destinations.isEmpty ? _emptyState() : _destinationList(destinations),
             ),
             SliverToBoxAdapter(child: _sectionHeader(title: 'Things to do')),
+
             SliverToBoxAdapter(child: _experienceCarousel()),
             SliverToBoxAdapter(child: _passportBanner()),
             const SliverToBoxAdapter(child: SizedBox(height: 28)),
@@ -697,12 +747,12 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
     );
   }
 
-  // ---------------------------------------------------------------- header
-
+  // Header và thanh tìm kiếm
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
-      child: Row(
+      child: Row //header dùng row để xếp ngang
+        (
         children: [
           Container(
             width: 46,
@@ -761,6 +811,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
           const SizedBox(width: 8),
           InkWell(
             onTap: () => _showDestinationsSheet('Saved places', _savedDestinations),
+            //nút yêu thích : Mở bảng với danh sách đã đánh dấu
             borderRadius: BorderRadius.circular(999),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
@@ -798,13 +849,16 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       ),
     );
   }
-  Widget _buildSearch() {
+  Widget _buildSearch() { //thanh tìm kiếm
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
-      child: TextField(
-        controller: _searchController,
+      child: TextField //ô nhập dữ liệu
+       (
+        controller: _searchController, //controller liên kết nội dung nhập với controller
         textInputAction: TextInputAction.search,
-        onChanged: (value) => setState(() => _query = value),
+        //gợi ý nút search trên bàn phím,không tự triển khai thuật toán tìm kiếm
+        onChanged: (value) => setState(() => _query = value), // onChanged khi người dùng thay đổi nội dung
+        //_query=value lưu từ khóa mới, setState() yêu câù xây dưng lại gdien
         decoration: InputDecoration(
           hintText: 'Where do you want to go?',
           hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 14.5),
@@ -814,7 +868,8 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
               : IconButton(
             onPressed: () {
               _searchController.clear();
-              setState(() => _query = '');
+              setState(() => _query = ''); //xóa nội dung hiển thị lẫn từ khóa logic
+              //ô rỗng biểu tượng micro, có chữ: nút xóa
             },
             icon: const Icon(Icons.close_rounded),
           ),
@@ -825,11 +880,11 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
             borderRadius: BorderRadius.circular(18),
             borderSide: const BorderSide(color: _line),
           ),
-          enabledBorder: OutlineInputBorder(
+          enabledBorder: OutlineInputBorder( //enabledBorder là viền khi ô hoạt động nhưng chưa được focus
             borderRadius: BorderRadius.circular(18),
             borderSide: const BorderSide(color: _line),
           ),
-          focusedBorder: OutlineInputBorder(
+          focusedBorder: OutlineInputBorder( //focusedBorder là viền khi đang chọn ô nhập
             borderRadius: BorderRadius.circular(18),
             borderSide: const BorderSide(color: _primary, width: 1.3),
           ),
@@ -838,7 +893,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
     );
   }
 
-  // ------------------------------------------------------------------ hero
+  // Băng chuyền ảnh và dấu chỉ báo
 
   Widget _buildHero() {
     final items = _featured;
@@ -850,20 +905,22 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
           SizedBox(
             height: 270,
             child: PageView.builder(
-              controller: _heroController,
-              itemCount: items.length,
-              onPageChanged: (i) => setState(() => _heroIndex = i),
+              controller: _heroController, //điểu khiển trang
+              itemCount: items.length, //itemCount số trang
+              onPageChanged: (i) => setState(() => _heroIndex = i),//cập nhật chỉ số khi chuyển trang
               itemBuilder: (context, index) => _heroCard(items[index]),
+              //itemBuilder : dựng thẻ tương ứng
             ),
-          ),
+          ), //không có timer hay lệnh tự chuyển, nên băng chuyền hiện được chuyển bằng thao tác người dùng
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(items.length, (i) {
-              final active = i == _heroIndex;
+            children: List.generate(items.length, (i) //dấu chỉ báo
+            {
+              final active = i == _heroIndex; //tạo dấu cho mỗi trang; xác định dấu nào đang được chọn
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
-                curve: Curves.easeOut,
+                curve: Curves.easeOut, //easeOut giúp chuyển động chậm dần ở cuối
                 margin: const EdgeInsets.symmetric(horizontal: 3),
                 width: active ? 22 : 7,
                 height: 7,
@@ -879,12 +936,12 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
     );
   }
 
+  //Thẻ banner và thẻ địa điểm
   Widget _heroCard(_Destination item) {
-    final saved = _favorites.contains(item.id);
-
+    final saved = _favorites.contains(item.id);//kiểm tra để vẽ trái tim rỗng hoặc đầy
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: GestureDetector(
+      child: GestureDetector( //bắt đầu thao tác chạm lên thẻ
         onTap: () => _openDestination(item),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(30),
@@ -894,7 +951,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
               _assetImage(item.image),
               const DecoratedBox(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
+                  gradient: LinearGradient( //tạo lớp phú từ trong suốt sang tối ở phần dưới ảnh để chữ trắng dễ đọc
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [Color(0x1A07130F), Color(0x0007130F), Color(0xE607130F)],
@@ -986,41 +1043,44 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
     );
   }
 
-  // --------------------------------------------------------------- regions
-
+  // nút lọc khu vực
   Widget _buildRegionFilter() {
     return SizedBox(
       height: 46,
       child: ListView.separated(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 6),
-        scrollDirection: Axis.horizontal,
+        scrollDirection: Axis.horizontal, //tạo danh sách các nút cuộn ngang
         itemCount: _regions.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, __) => const SizedBox(width: 8), //tạo kcach giữa các nút.
+        //tham số không sử dụng nên được đặt tên dạng gạch dưới
         itemBuilder: (context, index) {
           final region = _regions[index];
           final selected = region == _selectedRegion;
-
+          //kiểm tra tên khu vực và kiểm tra khu vực đó có được chọn hay không
           return ChoiceChip(
-            label: Text(region),
-            selected: selected,
-            showCheckmark: false,
+            label: Text(region),//nhãn của nút
+            selected: selected, //trạng thái chọn
+            showCheckmark: false, //không hiện dấu tích
             selectedColor: _primary,
             backgroundColor: _surface,
             side: BorderSide(color: selected ? _primary : _line),
-            shape: const StadiumBorder(),
+            shape: const StadiumBorder(), //tạo hình viên thuốc
             labelStyle: TextStyle(
               color: selected ? Colors.white : _text,
               fontSize: 13,
               fontWeight: FontWeight.w700,
             ),
             onSelected: (_) => setState(() => _selectedRegion = region),
+            //lưu khu vực và cập nhật giao diện
           );
         },
       ),
     );
   }
-
-  Widget _sectionHeader({required String title, String? action, VoidCallback? onAction}) {
+//tiêu đề và danh sách cuộn ngang
+  Widget _sectionHeader({required String title, String? action, VoidCallback? onAction})
+  //title: bắt buộc,action: nhãn tùy chọn, vd View All, onAction hàm xử lý khi nhấn, VoidCallback: hàm kh nhận tham số kh trả về gia trị
+  {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 22, 12, 10),
       child: Row(
@@ -1036,7 +1096,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
               ),
             ),
           ),
-          if (action != null && onAction != null)
+          if (action != null && onAction != null)//chỉ tạo nút khi có cả nhãn và hành động
             TextButton(
               onPressed: onAction,
               child: Text(
@@ -1049,14 +1109,14 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
     );
   }
 
-  // ------------------------------------------------------ destination list
-
+  //Danh sách địa điểm
   Widget _destinationList(List<_Destination> list) {
     return SizedBox(
       height: 262,
       child: ListView.separated(
         padding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
         scrollDirection: Axis.horizontal,
+        //giới hạn chiều cao và vùng cuộn ngang
         physics: const BouncingScrollPhysics(),
         itemCount: list.length,
         separatorBuilder: (_, __) => const SizedBox(width: 14),
@@ -1251,7 +1311,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
     );
   }
 
-  // ------------------------------------------------------ passport banner
+  // Banner passport
 
   Widget _passportBanner() {
     return Padding(
@@ -1259,6 +1319,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       child: InkWell(
         borderRadius: BorderRadius.circular(26),
         onTap: () => AppNav.tab.value = AppNav.passport,
+        //toàn bộ banner có thể nhấn để gửi yêu cầu chuyển sang passport
         child: Container(
           padding: const EdgeInsets.fromLTRB(20, 18, 16, 18),
           decoration: BoxDecoration(
@@ -1337,7 +1398,8 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
 
   // -------------------------------------------------------------- helpers
 
-  Widget _emptyState() {
+  Widget _emptyState()
+  {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 30),
       child: Column(
@@ -1347,6 +1409,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
           const Text(
             'No destinations match your search',
             style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
+            //thông báo không có kết quả và cung cấp cách khôi phục danh sách
           ),
           const SizedBox(height: 10),
           TextButton(onPressed: _resetFilters, child: const Text('Clear filters')),
@@ -1355,10 +1418,12 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
     );
   }
 
-  Widget _heartButton(bool saved, VoidCallback onTap, {double size = 38}) {
+  Widget _heartButton(bool saved, VoidCallback onTap, {double size = 38})
+  //nhận trạng thái, hàm xử lý và kích thước tùy chọn
+  {
     return GestureDetector(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+      behavior: HitTestBehavior.opaque, //cho phép vùng trong suốt trong phạm vi của bộ phận thao tác vẫn tham gia nhận chạm
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: Container(
