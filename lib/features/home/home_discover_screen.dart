@@ -27,10 +27,10 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
   String _selectedRegion = 'All';
   int _heroIndex = 0;
   final Set<String> _favorites = <String>{};
-
-  final List<String> _regions = const <String>['All', 'North', 'Central', 'South', 'Mekong'];
+  final List<String> _regions = const <String>['All', 'North', 'Central', 'South'];
 
   final List<_Destination> _destinations = const <_Destination>[
+    // ======================= NORTH =======================
     _Destination(
       id: 'hanoi',
       title: 'Hanoi',
@@ -71,175 +71,6 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       budget: '1.5M/day',
     ),
     _Destination(
-      id: 'danang',
-      title: 'Da Nang',
-      subtitle: 'Beach & city',
-      region: 'Central',
-      image: 'assets/images/danang.jpg',
-      rating: 4.8,
-      description:
-      'A clean beach city with the Dragon Bridge, Marble Mountains and the Ba Na Hills a short ride away.',
-      bestTime: 'Feb - May',
-      duration: '3 days',
-      budget: '900k/day',
-    ),
-    _Destination(
-      id: 'hoian',
-      title: 'Hoi An',
-      subtitle: 'Lanterns & heritage',
-      region: 'Central',
-      image: 'assets/images/hoian.jpg',
-      rating: 4.9,
-      description:
-      'A lantern-lit ancient town. Get a tailored outfit, cycle through paddy fields and float a candle on the river.',
-      bestTime: 'Feb - Apr',
-      duration: '2 days',
-      budget: '850k/day',
-    ),
-    _Destination(
-      id: 'nhatrang',
-      title: 'Nha Trang',
-      subtitle: 'Sea & island escape',
-      region: 'South',
-      image: 'assets/images/nhatrang.jpg',
-      rating: 4.7,
-      description:
-      'Island hopping, snorkeling and mud baths along a long curved bay.',
-      bestTime: 'Jan - Aug',
-      duration: '3 days',
-      budget: '1M/day',
-    ),
-    _Destination(
-      id: 'phuquoc',
-      title: 'Phu Quoc',
-      subtitle: 'Tropical island',
-      region: 'South',
-      image: 'assets/images/phuquoc.jpg',
-      rating: 4.8,
-      description:
-      'White sand, clear water and night markets. The easiest place in Vietnam to do nothing well.',
-      bestTime: 'Nov - Apr',
-      duration: '4 days',
-      budget: '1.4M/day',
-    ),
-    _Destination(
-      id: 'cantho',
-      title: 'Can Tho',
-      subtitle: 'River & floating market',
-      region: 'Mekong',
-      image: 'assets/images/cantho.jpg',
-      rating: 4.7,
-      description:
-      'Board a boat at dawn for the Cai Rang floating market, then eat fruit straight from the orchard.',
-      bestTime: 'Aug - Dec',
-      duration: '2 days',
-      budget: '600k/day',
-    ),
-    _Destination(
-      id: 'bentre',
-      title: 'Ben Tre',
-      subtitle: 'Coconut groves & canals',
-      region: 'Mekong',
-      image: 'assets/images/bentre.jpg',
-      rating: 4.7,
-      description:
-      'The coconut capital of Vietnam. Paddle a small boat through narrow canals, watch candy being made from coconut and stay in a riverside homestay.',
-      bestTime: 'Dec - Apr',
-      duration: '2 days',
-      budget: '600k/day',
-    ),
-    _Destination(
-      id: 'chaudoc',
-      title: 'Chau Doc',
-      subtitle: 'Floating villages & Sam Mountain',
-      region: 'Mekong',
-      image: 'assets/images/chaudoc.jpg',
-      rating: 4.7,
-      description:
-      'A border town on the Bassac River. Visit the floating fish farms, the Cham village and climb Sam Mountain for a view over the paddy fields.',
-      bestTime: 'Sep - Nov',
-      duration: '2 days',
-      budget: '600k/day',
-    ),
-    _Destination(
-      id: 'camau',
-      title: 'Ca Mau',
-      subtitle: 'Mangroves & the southern tip',
-      region: 'Mekong',
-      image: 'assets/images/camau.jpg',
-      rating: 4.6,
-      description:
-      'Take a boat through the U Minh mangrove forest and travel to Mui Ca Mau, the southernmost point of mainland Vietnam.',
-      bestTime: 'Dec - Apr',
-      duration: '2 days',
-      budget: '550k/day',
-    ),
-    _Destination(
-      id: 'vinhlong',
-      title: 'Vinh Long',
-      subtitle: 'Orchards & village life',
-      region: 'Mekong',
-      image: 'assets/images/vinhlong.jpg',
-      rating: 4.6,
-      description:
-      'Cycle between fruit orchards, visit old riverside houses and see how pottery and bricks are made in the traditional kilns.',
-      bestTime: 'May - Aug',
-      duration: '2 days',
-      budget: '550k/day',
-    ),
-    _Destination(
-      id: 'dongthap',
-      title: 'Dong Thap',
-      subtitle: 'Lotus fields & Sa Dec flowers',
-      region: 'Mekong',
-      image: 'assets/images/dongthap.jpg',
-      rating: 4.7,
-      description:
-      'Famous for its pink lotus ponds, the Sa Dec flower village and Tram Chim National Park, where cranes visit in the dry season.',
-      bestTime: 'Jun - Aug',
-      duration: '2 days',
-      budget: '550k/day',
-    ),
-    _Destination(
-      id: 'dalat',
-      title: 'Da Lat',
-      subtitle: 'Pine hills & cool cafes',
-      region: 'Central',
-      image: 'assets/images/dalat.jpg',
-      rating: 4.8,
-      description:
-      'A cool highland town of pine forests, flower farms and hillside cafes. Ride to the waterfalls or just wander the lake at dusk.',
-      bestTime: 'Dec - Mar',
-      duration: '3 days',
-      budget: '750k/day',
-    ),
-    _Destination(
-      id: 'hochiminh',
-      title: 'Ho Chi Minh City',
-      subtitle: 'Street food & city life',
-      region: 'South',
-      image: 'assets/images/hochiminh.jpg',
-      rating: 4.7,
-      description:
-      'Vietnam\'s busiest city. Eat your way through Ben Thanh and District 1, visit the War Remnants Museum and finish on a rooftop bar.',
-      bestTime: 'Dec - Apr',
-      duration: '3 days',
-      budget: '1M/day',
-    ),
-    _Destination(
-      id: 'hue',
-      title: 'Hue',
-      subtitle: 'Imperial city & royal tombs',
-      region: 'Central',
-      image: 'assets/images/hue.jpg',
-      rating: 4.8,
-      description:
-      'The old capital of the Nguyen emperors. Explore the Citadel, the royal tombs along the Perfume River and the local royal cuisine.',
-      bestTime: 'Jan - Apr',
-      duration: '2 days',
-      budget: '700k/day',
-    ),
-    _Destination(
       id: 'ninhbinh',
       title: 'Ninh Binh',
       subtitle: 'Karst rivers & ancient capital',
@@ -266,6 +97,60 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       budget: '700k/day',
     ),
     _Destination(
+      id: 'laocai',
+      title: 'Lao Cai',
+      subtitle: 'Fansipan & Bac Ha market',
+      region: 'North',
+      image: 'assets/images/laocai.jpg',
+      rating: 4.8,
+      description:
+      'Take the cable car up Fansipan, the highest peak in Indochina, then visit the colorful Bac Ha Sunday market and the terraced valleys of Y Ty.',
+      bestTime: 'Sep - Nov',
+      duration: '3 days',
+      budget: '700k/day',
+    ),
+
+    // ======================= CENTRAL =======================
+    _Destination(
+      id: 'hue',
+      title: 'Hue',
+      subtitle: 'Imperial city & royal tombs',
+      region: 'Central',
+      image: 'assets/images/hue.jpg',
+      rating: 4.8,
+      description:
+      'The old capital of the Nguyen emperors. Explore the Citadel, the royal tombs along the Perfume River and the local royal cuisine.',
+      bestTime: 'Jan - Apr',
+      duration: '2 days',
+      budget: '700k/day',
+    ),
+    _Destination(
+      id: 'danang',
+      title: 'Da Nang',
+      subtitle: 'Beach & city',
+      region: 'Central',
+      image: 'assets/images/danang.jpg',
+      rating: 4.8,
+      description:
+      'A clean beach city with the Dragon Bridge, Marble Mountains and the Ba Na Hills a short ride away.',
+      bestTime: 'Feb - May',
+      duration: '3 days',
+      budget: '900k/day',
+    ),
+    _Destination(
+      id: 'hoian',
+      title: 'Hoi An',
+      subtitle: 'Lanterns & heritage',
+      region: 'Central',
+      image: 'assets/images/hoian.jpg',
+      rating: 4.9,
+      description:
+      'A lantern-lit ancient town. Get a tailored outfit, cycle through paddy fields and float a candle on the river.',
+      bestTime: 'Feb - Apr',
+      duration: '2 days',
+      budget: '850k/day',
+    ),
+    _Destination(
       id: 'quynhon',
       title: 'Quy Nhon',
       subtitle: 'Quiet beaches & seafood',
@@ -279,10 +164,36 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       budget: '750k/day',
     ),
     _Destination(
+      id: 'nhatrang',
+      title: 'Nha Trang',
+      subtitle: 'Sea & island escape',
+      region: 'Central', // trước đây: South
+      image: 'assets/images/nhatrang.jpg',
+      rating: 4.7,
+      description:
+      'Island hopping, snorkeling and mud baths along a long curved bay.',
+      bestTime: 'Jan - Aug',
+      duration: '3 days',
+      budget: '1M/day',
+    ),
+    _Destination(
+      id: 'dalat',
+      title: 'Da Lat',
+      subtitle: 'Pine hills & cool cafes',
+      region: 'Central',
+      image: 'assets/images/dalat.jpg',
+      rating: 4.8,
+      description:
+      'A cool highland town of pine forests, flower farms and hillside cafes. Ride to the waterfalls or just wander the lake at dusk.',
+      bestTime: 'Dec - Mar',
+      duration: '3 days',
+      budget: '750k/day',
+    ),
+    _Destination(
       id: 'muine',
       title: 'Mui Ne',
       subtitle: 'Red dunes & kitesurfing',
-      region: 'South',
+      region: 'Central', // trước đây: South
       image: 'assets/images/muine.jpg',
       rating: 4.6,
       description:
@@ -290,6 +201,21 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       bestTime: 'Dec - Apr',
       duration: '2 days',
       budget: '800k/day',
+    ),
+
+    // ======================= SOUTH =======================
+    _Destination(
+      id: 'hochiminh',
+      title: 'Ho Chi Minh City',
+      subtitle: 'Street food & city life',
+      region: 'South',
+      image: 'assets/images/hochiminh.jpg',
+      rating: 4.7,
+      description:
+      'Vietnam\'s busiest city. Eat your way through Ben Thanh and District 1, visit the War Remnants Museum and finish on a rooftop bar.',
+      bestTime: 'Dec - Apr',
+      duration: '3 days',
+      budget: '1M/day',
     ),
     _Destination(
       id: 'condao',
@@ -305,17 +231,95 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> {
       budget: '1.3M/day',
     ),
     _Destination(
-      id: 'laocai',
-      title: 'Lao Cai',
-      subtitle: 'Fansipan & Bac Ha market',
-      region: 'North',
-      image: 'assets/images/laocai.jpg',
+      id: 'phuquoc',
+      title: 'Phu Quoc',
+      subtitle: 'Tropical island',
+      region: 'South',
+      image: 'assets/images/phuquoc.jpg',
       rating: 4.8,
       description:
-      'Take the cable car up Fansipan, the highest peak in Indochina, then visit the colorful Bac Ha Sunday market and the terraced valleys of Y Ty.',
+      'White sand, clear water and night markets. The easiest place in Vietnam to do nothing well.',
+      bestTime: 'Nov - Apr',
+      duration: '4 days',
+      budget: '1.4M/day',
+    ),
+    _Destination(
+      id: 'cantho',
+      title: 'Can Tho',
+      subtitle: 'River & floating market',
+      region: 'South', // trước đây: Mekong
+      image: 'assets/images/cantho.jpg',
+      rating: 4.7,
+      description:
+      'Board a boat at dawn for the Cai Rang floating market, then eat fruit straight from the orchard.',
+      bestTime: 'Aug - Dec',
+      duration: '2 days',
+      budget: '600k/day',
+    ),
+    _Destination(
+      id: 'bentre',
+      title: 'Ben Tre',
+      subtitle: 'Coconut groves & canals',
+      region: 'South', // trước đây: Mekong
+      image: 'assets/images/bentre.jpg',
+      rating: 4.7,
+      description:
+      'The coconut capital of Vietnam. Paddle a small boat through narrow canals, watch candy being made from coconut and stay in a riverside homestay.',
+      bestTime: 'Dec - Apr',
+      duration: '2 days',
+      budget: '600k/day',
+    ),
+    _Destination(
+      id: 'chaudoc',
+      title: 'Chau Doc',
+      subtitle: 'Floating villages & Sam Mountain',
+      region: 'South', // trước đây: Mekong
+      image: 'assets/images/chaudoc.jpg',
+      rating: 4.7,
+      description:
+      'A border town on the Bassac River. Visit the floating fish farms, the Cham village and climb Sam Mountain for a view over the paddy fields.',
       bestTime: 'Sep - Nov',
-      duration: '3 days',
-      budget: '700k/day',
+      duration: '2 days',
+      budget: '600k/day',
+    ),
+    _Destination(
+      id: 'camau',
+      title: 'Ca Mau',
+      subtitle: 'Mangroves & the southern tip',
+      region: 'South', // trước đây: Mekong
+      image: 'assets/images/camau.jpg',
+      rating: 4.6,
+      description:
+      'Take a boat through the U Minh mangrove forest and travel to Mui Ca Mau, the southernmost point of mainland Vietnam.',
+      bestTime: 'Dec - Apr',
+      duration: '2 days',
+      budget: '550k/day',
+    ),
+    _Destination(
+      id: 'vinhlong',
+      title: 'Vinh Long',
+      subtitle: 'Orchards & village life',
+      region: 'South', // trước đây: Mekong
+      image: 'assets/images/vinhlong.jpg',
+      rating: 4.6,
+      description:
+      'Cycle between fruit orchards, visit old riverside houses and see how pottery and bricks are made in the traditional kilns.',
+      bestTime: 'May - Aug',
+      duration: '2 days',
+      budget: '550k/day',
+    ),
+    _Destination(
+      id: 'dongthap',
+      title: 'Dong Thap',
+      subtitle: 'Lotus fields & Sa Dec flowers',
+      region: 'South', // trước đây: Mekong
+      image: 'assets/images/dongthap.jpg',
+      rating: 4.7,
+      description:
+      'Famous for its pink lotus ponds, the Sa Dec flower village and Tram Chim National Park, where cranes visit in the dry season.',
+      bestTime: 'Jun - Aug',
+      duration: '2 days',
+      budget: '550k/day',
     ),
   ];
 
