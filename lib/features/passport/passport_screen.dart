@@ -48,7 +48,7 @@ class PassportScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Digital\nPassport',
+            'Digital Passport',
             style: TextStyle(
               color: AppTheme.primaryColor,
               fontWeight: FontWeight.bold,
@@ -299,9 +299,9 @@ class PassportScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _cardInfo('Ngày cấp',
+              _cardInfo('Passport Issurance Date',
                   '${profile.issueDate.day}/${profile.issueDate.month}/${profile.issueDate.year}'),
-              _cardInfo('Đã ghé thăm', '${profile.visitedCount} địa danh'),
+              _cardInfo('Visited', '${profile.visitedCount} location(s)'),
             ],
           ),
         ],
@@ -341,7 +341,7 @@ class PassportScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'Tiến độ khám phá Việt Nam',
+                'Progress in exploring VietNam',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               Text(
