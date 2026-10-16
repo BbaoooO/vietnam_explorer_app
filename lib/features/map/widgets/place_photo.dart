@@ -36,7 +36,7 @@ class PlacePhoto extends StatelessWidget {
               place.imageUrl,
               height: 210,
               width: double.infinity,
-              fit: BoxFit.contain,
+              fit: BoxFit.cover,
               semanticLabel: 'Ảnh ${place.name}',
               loadingBuilder: (context, child, progress) {
                 if (progress == null) return child;
@@ -54,18 +54,10 @@ class PlacePhoto extends StatelessWidget {
                 );
               },
               errorBuilder: (context, error, stackTrace) =>
-                  _fallback('Chưa tải được ảnh. Kiểm tra kết nối mạng.'),
+                  _fallback('Lỗi ko tải dc ảnh'),
             ),
           ),
         ),
-        if (place.imageFile.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Text(
-            'Ảnh: ${place.imageAuthor} · ${place.imageLicense}',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-
-        ],
       ],
     );
   }
