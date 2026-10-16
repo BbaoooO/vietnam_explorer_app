@@ -112,7 +112,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Hà Nội - Ninh Bình',
+                              'Hanoi - Ninh Binh',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
