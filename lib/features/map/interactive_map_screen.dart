@@ -638,8 +638,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
-                        Icon(_regionIcons[entry.key], size: 18, color: green),
-                        const SizedBox(width: 7),
                         Text(entry.value, style: const TextStyle(color: green, fontWeight: FontWeight.w600, fontSize: 13)),
                       ]),
                     ),
