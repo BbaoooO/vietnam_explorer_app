@@ -2,7 +2,7 @@ import '../models/passport_stamp.dart';
 import '../models/traveler_profile.dart';
 
 final sampleProfile = TravelerProfile(
-  fullName: 'Nguyễn Văn A',
+  fullName: 'Đỗ Gia Bảo',
   avatarUrl: 'https://i.pravatar.cc/150?img=12',
   passportId: 'VN-TRAVELER-000123',
   issueDate: DateTime(2026, 1, 15),

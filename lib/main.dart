@@ -7,6 +7,7 @@ import 'core/providers/planner_provider.dart';
 import 'features/map/interactive_map_screen.dart';
 import 'features/passport/data/sample_passport_data.dart';
 import 'features/planner/planner_screen.dart';
+import 'features/profile/profile_screen.dart';
 
 void main() {
   runApp(
@@ -49,7 +50,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     const InteractiveMapScreen(),
     const PlannerScreen(),
     PassportScreen(profile: sampleProfile),
-    const Center(child: Text('Profile Screen')),
+    const ProfileScreen(),
   ];
 
   @override
