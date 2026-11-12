@@ -8,8 +8,14 @@ import 'features/map/interactive_map_screen.dart';
 import 'features/passport/data/sample_passport_data.dart';
 import 'features/planner/planner_screen.dart';
 import 'features/profile/profile_screen.dart';
+import 'features/auth/login_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   runApp(
     MultiProvider(
       providers: [
@@ -32,7 +38,22 @@ class VietNamExplorerApp extends StatelessWidget {
         primaryColor: const Color(0xFF0F4C3A),
         scaffoldBackgroundColor: const Color(0xFFF7F8FA),
       ),
-      home: const MainNavigationScreen(),
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(color: Color(0xFF0F4C3A)),
+              ),
+            );
+          }
+          if (snapshot.hasData) {
+            return const MainNavigationScreen();
+          }
+          return const LoginScreen();
+        },
+      ),
     );
   }
 }

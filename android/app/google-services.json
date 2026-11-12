@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "555589259961",
+    "project_id": "vietnam-explorer-ff3d8",
+    "storage_bucket": "vietnam-explorer-ff3d8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:555589259961:android:9bae48f563ebb0197fc168",
+        "android_client_info": {
+          "package_name": "com.vntraveltech.android_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLA7dOefEc708RkieRxKiv28Qte4m7Bgc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

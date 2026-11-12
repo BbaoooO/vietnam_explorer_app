@@ -20,9 +20,211 @@ class _PlannerScreenState extends State<PlannerScreen> {
 
   int _selectedDayIndex = 0;
 
+  // Form Bottom Sheet to Add New Plan
+  void _showAddPlanBottomSheet(BuildContext context) {
+    final titleController = TextEditingController();
+    final descController = TextEditingController();
+    final costController = TextEditingController();
+    TimeOfDay selectedTime = const TimeOfDay(hour: 9, minute: 0);
+    IconData selectedIcon = Icons.location_on;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              padding: EdgeInsets.only(
+                top: 24,
+                left: 20,
+                right: 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Add New Plan',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
+                            fontFamily: 'Be Vietnam Pro',
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.grey),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: titleController,
+                      decoration: InputDecoration(
+                        labelText: 'Activity Title',
+                        hintText: 'e.g., Visit Hoan Kiem Lake',
+                        prefixIcon: const Icon(Icons.title, color: primaryColor),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: descController,
+                      decoration: InputDecoration(
+                        labelText: 'Description',
+                        hintText: 'e.g., Take photos and enjoy egg coffee',
+                        prefixIcon: const Icon(Icons.description, color: primaryColor),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: InkWell(
+                            onTap: () async {
+                              final time = await showTimePicker(
+                                context: context,
+                                initialTime: selectedTime,
+                              );
+                              if (time != null) {
+                                setModalState(() {
+                                  selectedTime = time;
+                                });
+                              }
+                            },
+                            child: InputDecorator(
+                              decoration: InputDecoration(
+                                labelText: 'Time',
+                                prefixIcon: const Icon(Icons.access_time, color: primaryColor),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                              ),
+                              child: Text(selectedTime.format(context)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: costController,
+                            decoration: InputDecoration(
+                              labelText: 'Cost',
+                              hintText: 'e.g., 50,000 VND',
+                              prefixIcon: const Icon(Icons.payments_outlined, color: primaryColor),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Select Icon Category',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: primaryColor),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildIconOption(Icons.location_on, selectedIcon, (icon) => setModalState(() => selectedIcon = icon)),
+                        _buildIconOption(Icons.restaurant, selectedIcon, (icon) => setModalState(() => selectedIcon = icon)),
+                        _buildIconOption(Icons.flight, selectedIcon, (icon) => setModalState(() => selectedIcon = icon)),
+                        _buildIconOption(Icons.hotel, selectedIcon, (icon) => setModalState(() => selectedIcon = icon)),
+                        _buildIconOption(Icons.local_activity, selectedIcon, (icon) => setModalState(() => selectedIcon = icon)),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (titleController.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please enter an activity title'),
+                                backgroundColor: Colors.redAccent,
+                              ),
+                            );
+                            return;
+                          }
+
+                          final newItem = PlannerItem(
+                            id: DateTime.now().millisecondsSinceEpoch.toString(),
+                            title: titleController.text.trim(),
+                            description: descController.text.trim(),
+                            time: selectedTime.format(context),
+                            estimatedCost: costController.text.trim().isEmpty
+                                ? 'Free'
+                                : costController.text.trim(),
+                            isCompleted: false,
+                            icon: selectedIcon,
+                          );
+
+                          // Thêm vào Provider theo Day được chọn
+                          context.read<PlannerProvider>().addPlanToDay(_selectedDayIndex, newItem);
+                          Navigator.pop(context);
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Plan added to Day ${_selectedDayIndex + 1}!'),
+                              backgroundColor: primaryColor,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: secondaryColor,
+                          foregroundColor: primaryColor,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          'Save Plan',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildIconOption(IconData icon, IconData currentSelected, Function(IconData) onSelect) {
+    final isSelected = icon == currentSelected;
+    return GestureDetector(
+      onTap: () => onSelect(icon),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isSelected ? secondaryColor : Colors.grey.shade100,
+          shape: BoxShape.circle,
+          border: Border.all(color: isSelected ? primaryColor : Colors.transparent),
+        ),
+        child: Icon(icon, color: primaryColor, size: 22),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Gọi dữ liệu từ DummyDataRepository
     final plannerProvider = context.watch<PlannerProvider>();
     final currentDayData = plannerProvider.itineraries[_selectedDayIndex];
 
@@ -54,9 +256,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // TODO: Mở form thêm lịch trình
-        },
+        onPressed: () => _showAddPlanBottomSheet(context),
         backgroundColor: secondaryColor,
         foregroundColor: primaryColor,
         icon: const Icon(Icons.add),
@@ -165,7 +365,6 @@ class _PlannerScreenState extends State<PlannerScreen> {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        // Gọi độ dài danh sách từ DummyDataRepository
         itemCount: DummyDataRepository.itineraries.length,
         itemBuilder: (context, index) {
           final dayData = DummyDataRepository.itineraries[index];
