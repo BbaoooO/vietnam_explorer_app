@@ -20,7 +20,7 @@ class StampCard extends StatelessWidget {
         if (locked) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Bạn cần đến thăm ${stamp.placeName} để mở khóa!'),
+              content: Text('Visit ${stamp.placeName} to unlock this stamp.'),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -29,11 +29,11 @@ class StampCard extends StatelessWidget {
             context: context,
             builder: (context) => AlertDialog(
               title: Text(stamp.placeName),
-              content: Text('Kỷ niệm tuyệt vời của bạn tại ${stamp.province} vào ngày $formattedDate.'),
+              content: Text('You visited ${stamp.province} on $formattedDate.'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Đóng'),
+                  child: const Text('Close'),
                 )
               ],
             ),

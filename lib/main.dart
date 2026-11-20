@@ -87,14 +87,14 @@ class _TravelSessionState extends State<TravelSession> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Không mở được dữ liệu du lịch trên thiết bị.'),
+                const Text('Could not open travel data on this device.'),
                 TextButton(
                   onPressed: () => setState(() => _loading = _data.load()),
-                  child: const Text('Thử lại'),
+                  child: const Text('Try again'),
                 ),
                 TextButton(
                   onPressed: () async => FirebaseAuth.instance.signOut(),
-                  child: const Text('Đăng xuất'),
+                  child: const Text('Log out'),
                 ),
               ],
             ),

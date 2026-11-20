@@ -31,13 +31,13 @@ class PlacePhoto extends StatelessWidget {
           child: ColoredBox(
             color: const Color(0xFFF0F2F3),
             child: place.imageUrl.isEmpty
-                ? _fallback('Chưa có ảnh địa điểm')
+                ? _fallback('No photo available')
                 : Image.network(
               place.imageUrl,
               height: 210,
               width: double.infinity,
               fit: BoxFit.cover,
-              semanticLabel: 'Ảnh ${place.name}',
+              semanticLabel: 'Photo of ${place.name}',
               loadingBuilder: (context, child, progress) {
                 if (progress == null) return child;
                 final total = progress.expectedTotalBytes;
@@ -54,7 +54,7 @@ class PlacePhoto extends StatelessWidget {
                 );
               },
               errorBuilder: (context, error, stackTrace) =>
-                  _fallback('Lỗi ko tải dc ảnh'),
+                  _fallback('Could not load the photo'),
             ),
           ),
         ),

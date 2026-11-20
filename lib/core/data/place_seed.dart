@@ -10,7 +10,7 @@ const placeSeed = <TourismPlace>[
     province: 'Hà Nội',
     region: 'North',
     category: 'culture',
-    description: 'Hồ nước và không gian đi bộ ở trung tâm Hà Nội.',
+    description: 'A lake and pedestrian area in central Hanoi.',
     position: LatLng(21.02889, 105.8525),
     imageFile: 'Ho Hoan Kiem (13574475044).jpg',
     imageAuthor: 'Bem photography',
@@ -18,7 +18,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by/2.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Ho%C3%A0n_Ki%E1%BA%BFm_Lake',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'van_mieu',
@@ -27,7 +27,7 @@ const placeSeed = <TourismPlace>[
     province: 'Hà Nội',
     region: 'North',
     category: 'culture',
-    description: 'Di tích gắn với giáo dục và truyền thống khoa bảng.',
+    description: 'A historic site associated with education and Vietnam\'s tradition of scholarly examinations.',
     position: LatLng(21.02861, 105.83556),
     imageFile: 'Hanoi Temple of Literature.jpg',
     imageAuthor: 'Chuoibk',
@@ -35,7 +35,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'http://creativecommons.org/licenses/by-sa/3.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Temple_of_Literature,_Hanoi',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'chua_mot_cot',
@@ -44,7 +44,7 @@ const placeSeed = <TourismPlace>[
     province: 'Hà Nội',
     region: 'North',
     category: 'spiritual',
-    description: 'Ngôi chùa nổi tiếng với kiến trúc một cột.',
+    description: 'A pagoda known for its distinctive single-pillar design.',
     position: LatLng(21.0358306, 105.8336222),
     imageFile: 'One Pillar Pagoda.jpg',
     imageAuthor: 'Jean-Etienne Minh-Duy Poirrier',
@@ -52,7 +52,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/One_Pillar_Pagoda',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'trang_an',
@@ -61,7 +61,7 @@ const placeSeed = <TourismPlace>[
     province: 'Ninh Bình',
     region: 'North',
     category: 'nature',
-    description: 'Quần thể cảnh quan núi đá vôi, hang động và tuyến thuyền.',
+    description: 'A landscape of limestone mountains, caves, and boat routes.',
     position: LatLng(20.25667, 105.89639),
     imageFile: 'Trang An Scenic Landscape Complex, northern Vietnam (354) (38540830421).jpg',
     imageAuthor: 'Richard Mortel',
@@ -70,7 +70,7 @@ const placeSeed = <TourismPlace>[
     sourceUrl:
         'https://en.wikipedia.org/wiki/Tr%C3%A0ng_An_Scenic_Landscape_Complex',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'dai_noi',
@@ -79,7 +79,7 @@ const placeSeed = <TourismPlace>[
     province: 'Huế',
     region: 'Central',
     category: 'culture',
-    description: 'Khu hoàng cung của triều Nguyễn tại Huế.',
+    description: 'The Nguyễn dynasty\'s imperial palace complex in Huế.',
     position: LatLng(16.46972, 107.57778),
     imageFile: 'Citadel Hue.jpg',
     imageAuthor: 'sixty4coupe',
@@ -87,7 +87,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Imperial_City_of_Hu%E1%BA%BF',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'my_khe',
@@ -96,7 +96,7 @@ const placeSeed = <TourismPlace>[
     province: 'Đà Nẵng',
     region: 'Central',
     category: 'beach',
-    description: 'Bãi biển ven thành phố Đà Nẵng.',
+    description: 'A beach along the coast of Đà Nẵng.',
     position: LatLng(16.07, 108.2461111),
     imageFile: 'My Khe Beach 1.jpg',
     imageAuthor: 'Christophe95',
@@ -104,7 +104,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
     sourceUrl: 'https://www.wikidata.org/wiki/Q10796763',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'linh_ung',
@@ -113,7 +113,7 @@ const placeSeed = <TourismPlace>[
     province: 'Đà Nẵng',
     region: 'Central',
     category: 'spiritual',
-    description: 'Ngôi chùa trên bán đảo Sơn Trà với tượng Quan Âm.',
+    description: 'A pagoda on the Sơn Trà Peninsula with a statue of the bodhisattva of compassion.',
     position: LatLng(16.10014, 108.27844),
     imageFile: 'Chùa Linh Ứng - Sơn Trà - NKS.jpg',
     imageAuthor: 'NKSTTSSHNVN',
@@ -121,7 +121,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
     sourceUrl: 'https://mapcarta.com/W486703049',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'hoi_an',
@@ -130,7 +130,7 @@ const placeSeed = <TourismPlace>[
     province: 'Hội An',
     region: 'Central',
     category: 'culture',
-    description: 'Khu phố cổ với nhà cổ, hội quán và dấu tích thương cảng.',
+    description: 'A historic trading town with old houses, assembly halls, and traces of its port.',
     position: LatLng(15.8833333, 108.3333333),
     imageFile: 'Hoi An, Vietnam.jpg',
     imageAuthor: '. Ray in Manila',
@@ -138,7 +138,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by/2.0',
     sourceUrl: 'https://whc.unesco.org/en/list/948/',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'ben_thanh',
@@ -147,7 +147,7 @@ const placeSeed = <TourismPlace>[
     province: 'TP.HCM',
     region: 'South',
     category: 'food',
-    description: 'Chợ truyền thống ở trung tâm Thành phố Hồ Chí Minh.',
+    description: 'A traditional market in central Ho Chi Minh City.',
     position: LatLng(10.7725207, 106.6980192),
     imageFile: 'Ben Thanh market in Vietnam (340932410).jpg',
     imageAuthor: 'MrTMan from Jyväskylä, Finland',
@@ -155,7 +155,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/B%E1%BA%BFn_Th%C3%A0nh_Market',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'dinh_doc_lap',
@@ -164,7 +164,7 @@ const placeSeed = <TourismPlace>[
     province: 'TP.HCM',
     region: 'South',
     category: 'culture',
-    description: 'Di tích lịch sử còn có tên gọi Hội trường Thống Nhất.',
+    description: 'A historic landmark also known as Reunification Hall.',
     position: LatLng(10.77694, 106.69528),
     imageFile: '20190923 Independence Palace-10.jpg',
     imageAuthor: 'Balon Greyjoy',
@@ -172,7 +172,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
     sourceUrl: 'https://en.wikipedia.org/wiki/Independence_Palace',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'buu_long',
@@ -182,7 +182,7 @@ const placeSeed = <TourismPlace>[
     region: 'South',
     category: 'spiritual',
     description:
-        'Ngôi chùa có kiến trúc nổi bật ở khu vực phía đông thành phố.',
+        'A pagoda with distinctive architecture in eastern Ho Chi Minh City.',
     position: LatLng(10.8787831, 106.8359789),
     imageFile: 'Chùa Bửu Long (48813026093).jpg',
     imageAuthor: 'Sketyl none',
@@ -190,7 +190,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by/2.0',
     sourceUrl: 'https://www.wikidata.org/wiki/Q32608093',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'phu_quoc',
@@ -199,14 +199,15 @@ const placeSeed = <TourismPlace>[
     province: 'Phú Quốc',
     region: 'South',
     category: 'beach',
-    description: 'Bãi biển cát trắng ở phía nam đảo Phú Quốc.',
+    description: 'A white sand beach in the south of Phú Quốc Island.',
     position: LatLng(10.058171, 104.037492),
     imageFile: 'Bai-sao-phu-quoc-tuonglamphotos.jpg',
     imageAuthor: 'Trantuonglam',
     imageLicense: 'CC BY-SA 4.0',
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
     sourceUrl: 'https://commons.wikimedia.org/wiki/File:Bai-sao-phu-quoc-tuonglamphotos.jpg',
-    coordinateNote: 'Điểm chụp ảnh trên Bãi Sao, không phải tọa độ cổng vào.',
+    coordinateNote:
+        'Photo location on Bãi Sao beach. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'lang_bac',
@@ -215,7 +216,7 @@ const placeSeed = <TourismPlace>[
     province: 'Hà Nội',
     region: 'North',
     category: 'culture',
-    description: 'Công trình lưu giữ thi hài Chủ tịch Hồ Chí Minh tại Ba Đình.',
+    description: 'The mausoleum of President Hồ Chí Minh in Ba Đình.',
     position: LatLng(21.03667, 105.83472),
     imageFile: 'Ho chi minh mausoleum.jpg',
     imageAuthor: 'Gregor Dodson',
@@ -223,7 +224,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Ho_Chi_Minh_Mausoleum',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'tran_quoc',
@@ -232,7 +233,7 @@ const placeSeed = <TourismPlace>[
     province: 'Hà Nội',
     region: 'North',
     category: 'spiritual',
-    description: 'Ngôi chùa cổ nằm bên Hồ Tây.',
+    description: 'A historic pagoda on the shore of West Lake.',
     position: LatLng(21.04778, 105.83667),
     imageFile: 'Chùa Trấn Quốc, Hà Nội.jpg',
     imageAuthor: 'Thang Nguyen',
@@ -240,7 +241,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Tran_Quoc_Pagoda',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'nha_hat_hn',
@@ -249,8 +250,7 @@ const placeSeed = <TourismPlace>[
     province: 'Hà Nội',
     region: 'North',
     category: 'culture',
-    description:
-        'Nhà hát mang phong cách kiến trúc châu Âu ở trung tâm Hà Nội.',
+    description: 'A European-style opera house in central Hanoi.',
     position: LatLng(21.02417, 105.85778),
     imageFile: 'Hanoi Opera House, 24 December 2016.jpg',
     imageAuthor: 'xiquinhosilva',
@@ -258,7 +258,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by/2.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Hanoi_Opera_House',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'hoang_thanh',
@@ -267,7 +267,7 @@ const placeSeed = <TourismPlace>[
     province: 'Hà Nội',
     region: 'North',
     category: 'culture',
-    description: 'Khu di sản gắn với lịch sử kinh đô Thăng Long.',
+    description: 'A heritage site associated with the history of the Thăng Long capital.',
     position: LatLng(21.03944, 105.83722),
     imageFile: 'Main Gate - Citadel of Hanoi.jpg',
     imageAuthor: 'Grenouille vert',
@@ -275,7 +275,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Imperial_Citadel_of_Thang_Long',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'hoa_lo',
@@ -284,7 +284,7 @@ const placeSeed = <TourismPlace>[
     province: 'Hà Nội',
     region: 'North',
     category: 'culture',
-    description: 'Di tích nhà tù, hiện trưng bày các tư liệu lịch sử.',
+    description: 'A former prison with exhibits on its history.',
     position: LatLng(21.0257, 105.8461),
     imageFile: 'Hoa Lo Prison (9753921911).jpg',
     imageAuthor: 'Gary Todd',
@@ -292,7 +292,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
     sourceUrl: 'https://en.wikipedia.org/wiki/Hoa_Lo_Prison',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'dan_toc_hoc',
@@ -301,8 +301,7 @@ const placeSeed = <TourismPlace>[
     province: 'Hà Nội',
     region: 'North',
     category: 'culture',
-    description:
-        'Bảo tàng giới thiệu đời sống và văn hóa các dân tộc Việt Nam.',
+    description: 'A museum exploring the lives and cultures of Vietnam\'s ethnic groups.',
     position: LatLng(21.0406, 105.7987),
     imageFile: 'Dan toc hoc 1.jpg',
     imageAuthor: 'Rungbachduong',
@@ -310,7 +309,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'http://creativecommons.org/licenses/by-sa/3.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Vietnam_Museum_of_Ethnology',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'chua_huong',
@@ -319,7 +318,8 @@ const placeSeed = <TourismPlace>[
     province: 'Hà Nội',
     region: 'North',
     category: 'spiritual',
-    description: 'Quần thể chùa và cảnh quan núi đá tại khu vực Hương Sơn.',
+    description:
+        'A complex of pagodas set among the rocky mountains of Hương Sơn.',
     position: LatLng(20.62, 105.75),
     imageFile: 'Thiên Trù Pagoda.jpg',
     imageAuthor: 'Jack French',
@@ -327,7 +327,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by/2.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Perfume_Pagoda',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'bai_dinh',
@@ -336,7 +336,7 @@ const placeSeed = <TourismPlace>[
     province: 'Ninh Bình',
     region: 'North',
     category: 'spiritual',
-    description: 'Quần thể chùa gồm khu chùa cổ và khu chùa mới.',
+    description: 'A pagoda complex with separate historic and modern sections.',
     position: LatLng(20.27694, 105.86278),
     imageFile: 'Bái Đính.jpg',
     imageAuthor: 'Jonathan Good',
@@ -344,7 +344,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Bai_Dinh_Temple',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'tam_coc',
@@ -353,7 +353,8 @@ const placeSeed = <TourismPlace>[
     province: 'Ninh Bình',
     region: 'North',
     category: 'nature',
-    description: 'Cảnh quan sông, hang động và núi đá vôi của Ninh Bình.',
+    description:
+        'A landscape of rivers, caves, and limestone mountains in Ninh Bình.',
     position: LatLng(20.2183333, 105.9161111),
     imageFile: 'Tam Cốc.jpg',
     imageAuthor: '[Tycho] / shansov.net',
@@ -361,7 +362,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0',
     sourceUrl: 'https://www.wikidata.org/wiki/Q1406000',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'fansipan',
@@ -370,7 +371,8 @@ const placeSeed = <TourismPlace>[
     province: 'Sa Pa',
     region: 'North',
     category: 'nature',
-    description: 'Đỉnh núi cao nhất Việt Nam, thuộc dãy Hoàng Liên Sơn.',
+    description:
+        'Vietnam\'s highest peak, in the Hoàng Liên Sơn mountain range.',
     position: LatLng(22.30333, 103.775),
     imageFile: 'Fansipan Summit.jpg',
     imageAuthor: 'Isderion',
@@ -378,7 +380,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/de',
     sourceUrl: 'https://en.wikipedia.org/wiki/Fansipan',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'ban_gioc',
@@ -386,8 +388,7 @@ const placeSeed = <TourismPlace>[
     province: 'Cao Bằng',
     region: 'North',
     category: 'nature',
-    description:
-        'Thác nước trên sông Quây Sơn tại biên giới Việt Nam và Trung Quốc.',
+    description: 'Waterfalls on the Quây Sơn River at the border between Vietnam and China.',
     position: LatLng(22.8564, 106.722),
     imageFile: 'Ban Gioc - Detian Falls2.jpg',
     imageAuthor: 'jankgo',
@@ -395,7 +396,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by/2.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Ban_Gioc%E2%80%93Detian_Falls',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'thien_mu',
@@ -404,7 +405,8 @@ const placeSeed = <TourismPlace>[
     province: 'Huế',
     region: 'Central',
     category: 'spiritual',
-    description: 'Ngôi chùa bên sông Hương, nổi bật với tháp Phước Duyên.',
+    description:
+        'A pagoda on the Perfume River known for its Phước Duyên tower.',
     position: LatLng(16.453599, 107.544812),
     imageFile: 'ThienMuPagoda.jpg',
     imageAuthor: 'Lưu Ly',
@@ -413,7 +415,7 @@ const placeSeed = <TourismPlace>[
         'https://commons.wikimedia.org/wiki/File:ThienMuPagoda.jpg',
     sourceUrl: 'https://en.wikipedia.org/wiki/Thien_Mu_Pagoda',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'khai_dinh',
@@ -422,7 +424,7 @@ const placeSeed = <TourismPlace>[
     province: 'Huế',
     region: 'Central',
     category: 'culture',
-    description: 'Lăng vua Khải Định với kiến trúc và trang trí khảm sành sứ.',
+    description: 'The tomb of Emperor Khải Định, known for its architecture and ceramic mosaics.',
     position: LatLng(16.39893, 107.59029),
     imageFile: 'Stone statues at the tombs of emperor Khải Định 01.jpg',
     imageAuthor: 'Jorge Cancela',
@@ -430,7 +432,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by/2.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Tomb_of_Khai_Dinh',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'tu_duc',
@@ -439,7 +441,7 @@ const placeSeed = <TourismPlace>[
     province: 'Huế',
     region: 'Central',
     category: 'culture',
-    description: 'Khu lăng vua Tự Đức với hồ nước, điện thờ và cảnh quan vườn.',
+    description: 'The tomb complex of Emperor Tự Đức, with a lake, pavilions, and gardens.',
     position: LatLng(16.4325, 107.566),
     imageFile: 'TuDucTombeau 06.jpg',
     imageAuthor: 'BluesyPete',
@@ -447,7 +449,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Tomb_of_Tu_Duc',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'cau_rong',
@@ -456,7 +458,7 @@ const placeSeed = <TourismPlace>[
     province: 'Đà Nẵng',
     region: 'Central',
     category: 'culture',
-    description: 'Cây cầu hình rồng bắc qua sông Hàn.',
+    description: 'A dragon-shaped bridge across the Hàn River.',
     position: LatLng(16.06111, 108.22667),
     imageFile: 'Cầu Rồng.jpg',
     imageAuthor: 'Bùi Thụy Đào Nguyên',
@@ -464,7 +466,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Dragon_Bridge_(Da_Nang)',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'ngu_hanh_son',
@@ -473,7 +475,8 @@ const placeSeed = <TourismPlace>[
     province: 'Đà Nẵng',
     region: 'Central',
     category: 'nature',
-    description: 'Cụm núi đá với hang động, chùa và điểm ngắm cảnh.',
+    description:
+        'A cluster of rocky mountains with caves, pagodas, and viewpoints.',
     position: LatLng(16, 108.26),
     imageFile: 'Marble Mountains View 3.JPG',
     imageAuthor: 'Dragfyre',
@@ -481,7 +484,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Marble_Mountains_(Vietnam)',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'my_son',
@@ -489,7 +492,7 @@ const placeSeed = <TourismPlace>[
     province: 'Mỹ Sơn',
     region: 'Central',
     category: 'culture',
-    description: 'Quần thể đền tháp Chăm trong thung lũng Mỹ Sơn.',
+    description: 'A complex of Cham temples and towers in the Mỹ Sơn valley.',
     position: LatLng(15.767, 108.117),
     imageFile: '2024 - Mỹ Sơn Sanctuary Temple E7 - img 01.jpg',
     imageAuthor: 'Chainwit.',
@@ -497,7 +500,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by/4.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/M%E1%BB%B9_S%C6%A1n_Sanctuary',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'po_nagar',
@@ -506,7 +509,8 @@ const placeSeed = <TourismPlace>[
     province: 'Nha Trang',
     region: 'Central',
     category: 'culture',
-    description: 'Quần thể tháp Chăm trên đồi gần sông Cái, Nha Trang.',
+    description:
+        'A complex of Cham towers overlooking the Cái River in Nha Trang.',
     position: LatLng(12.26528, 109.19556),
     imageFile:
         '04052023 Ponagar Hindu temples complex, Nha Trang Vietnam - 240.jpg',
@@ -515,7 +519,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
     sourceUrl: 'https://en.wikipedia.org/wiki/Po_Nagar',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'long_son',
@@ -524,7 +528,8 @@ const placeSeed = <TourismPlace>[
     province: 'Nha Trang',
     region: 'Central',
     category: 'spiritual',
-    description: 'Ngôi chùa ở Nha Trang nổi bật với tượng Phật trắng trên đồi.',
+    description:
+        'A pagoda in Nha Trang known for its hilltop white Buddha statue.',
     position: LatLng(12.251601, 109.180765),
     imageFile: 'Vietnam 2007 633.jpg',
     imageAuthor: 'Jame Healy',
@@ -532,7 +537,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Long_Son_Pagoda',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'ga_da_lat',
@@ -541,7 +546,7 @@ const placeSeed = <TourismPlace>[
     province: 'Đà Lạt',
     region: 'Central',
     category: 'culture',
-    description: 'Nhà ga lịch sử với kiến trúc đặc trưng của Đà Lạt.',
+    description: 'A historic railway station with architecture characteristic of Đà Lạt.',
     position: LatLng(11.942, 108.455),
     imageFile: 'Da Lat - Train Station.jpg',
     imageAuthor: 'P. Hughes',
@@ -549,7 +554,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by/4.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Da_Lat_railway_station',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'crazy_house',
@@ -558,7 +563,7 @@ const placeSeed = <TourismPlace>[
     province: 'Đà Lạt',
     region: 'Central',
     category: 'culture',
-    description: 'Công trình kiến trúc sáng tạo còn được gọi là Crazy House.',
+    description: 'An unconventional building also known as the Crazy House.',
     position: LatLng(11.9347333, 108.4306361),
     imageFile: 'HangNgaCrazyHouse2.jpg',
     imageAuthor: 'Kelisi',
@@ -566,7 +571,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'http://creativecommons.org/licenses/by-sa/3.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Hang_Nga_guesthouse',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'linh_phuoc',
@@ -576,7 +581,7 @@ const placeSeed = <TourismPlace>[
     region: 'Central',
     category: 'spiritual',
     description:
-        'Ngôi chùa nổi tiếng với trang trí bằng mảnh sành, sứ và thủy tinh.',
+        'A pagoda decorated with fragments of pottery, porcelain, and glass.',
     position: LatLng(11.9442833, 108.4995),
     imageFile: 'Da Lat - Linh Phuoc Temple 03.jpg',
     imageAuthor: 'P. Hughes',
@@ -584,7 +589,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by/4.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Linh_Phuoc_Pagoda',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'duc_ba',
@@ -594,7 +599,7 @@ const placeSeed = <TourismPlace>[
     region: 'South',
     category: 'spiritual',
     description:
-        'Nhà thờ Công giáo mang kiến trúc nổi bật ở trung tâm Sài Gòn.',
+        'A Catholic cathedral with distinctive architecture in central Saigon.',
     position: LatLng(10.77972, 106.69917),
     imageFile: 'Basílica de Nuestra Señora, Ciudad Ho Chi Minh, Vietnam, 2013-08-14, DD 09.JPG',
     imageAuthor: 'Diego Delso, delso.photo',
@@ -603,7 +608,7 @@ const placeSeed = <TourismPlace>[
     sourceUrl:
         'https://en.wikipedia.org/wiki/Notre-Dame_Cathedral_Basilica_of_Saigon',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'buu_dien',
@@ -612,7 +617,7 @@ const placeSeed = <TourismPlace>[
     province: 'TP.HCM',
     region: 'South',
     category: 'culture',
-    description: 'Công trình bưu điện lịch sử cạnh Nhà thờ Đức Bà.',
+    description: 'A historic post office beside Notre-Dame Cathedral Basilica of Saigon.',
     position: LatLng(10.78, 106.7),
     imageFile: 'Ho Chi Minh City, Central Post Office, 2020-01 CN-01.jpg',
     imageAuthor: 'Steffen Schmitz (Carschten)',
@@ -620,7 +625,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Saigon_Central_Post_Office',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'chung_tich',
@@ -629,7 +634,7 @@ const placeSeed = <TourismPlace>[
     province: 'TP.HCM',
     region: 'South',
     category: 'culture',
-    description: 'Bảo tàng trưng bày tư liệu và hiện vật về chiến tranh.',
+    description: 'A museum displaying wartime documents and artifacts.',
     position: LatLng(10.779475, 106.692132),
     imageFile: 'War Remnants Museum, HCMC, front.JPG',
     imageAuthor: 'Prenn',
@@ -637,7 +642,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/War_Remnants_Museum',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'nha_hat_hcm',
@@ -646,7 +651,7 @@ const placeSeed = <TourismPlace>[
     province: 'TP.HCM',
     region: 'South',
     category: 'culture',
-    description: 'Nhà hát lịch sử ở khu vực trung tâm Thành phố Hồ Chí Minh.',
+    description: 'A historic theater in central Ho Chi Minh City.',
     position: LatLng(10.7767, 106.7032194),
     imageFile: 'Municipal Theatre of Ho Chi Minh City, 2023 (01).jpg',
     imageAuthor: 'Bahnfrend',
@@ -655,7 +660,7 @@ const placeSeed = <TourismPlace>[
     sourceUrl:
         'https://en.wikipedia.org/wiki/Municipal_Theatre_of_Ho_Chi_Minh_City',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'ngoc_hoang',
@@ -664,8 +669,7 @@ const placeSeed = <TourismPlace>[
     province: 'TP.HCM',
     region: 'South',
     category: 'spiritual',
-    description:
-        'Ngôi chùa với kiến trúc và tượng thờ mang dấu ấn văn hóa Hoa.',
+    description: 'A pagoda with architecture and devotional statues reflecting Chinese cultural influences.',
     position: LatLng(10.7917111, 106.6978889),
     imageFile: 'Jade Emperor Pagoda Saigon.jpg',
     imageAuthor: 'Ymblanter',
@@ -673,7 +677,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Jade_Emperor_Pagoda',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'thien_hau',
@@ -682,7 +686,7 @@ const placeSeed = <TourismPlace>[
     province: 'TP.HCM',
     region: 'South',
     category: 'spiritual',
-    description: 'Hội quán Tuệ Thành thờ Thiên Hậu tại khu vực Chợ Lớn.',
+    description: 'The Tuệ Thành Assembly Hall, dedicated to Thiên Hậu in the Chợ Lớn district.',
     position: LatLng(10.7529111, 106.6611722),
     imageFile: 'Hội quán Tuệ Thành.jpg',
     imageAuthor: 'Christopher',
@@ -690,7 +694,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by/2.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Thien_Hau_Temple_of_Cholon',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'giac_lam',
@@ -699,7 +703,7 @@ const placeSeed = <TourismPlace>[
     province: 'TP.HCM',
     region: 'South',
     category: 'spiritual',
-    description: 'Một trong những ngôi chùa cổ của Thành phố Hồ Chí Minh.',
+    description: 'One of the oldest pagodas in Ho Chi Minh City.',
     position: LatLng(10.77944, 106.64917),
     imageFile: 'ChuaGiacLam02.jpg',
     imageAuthor: 'Phan Ba at vi.wikipedia',
@@ -708,7 +712,7 @@ const placeSeed = <TourismPlace>[
         'https://commons.wikimedia.org/wiki/File:ChuaGiacLam02.jpg',
     sourceUrl: 'https://en.wikipedia.org/wiki/Giac_Lam_Pagoda',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'vinh_trang',
@@ -716,8 +720,7 @@ const placeSeed = <TourismPlace>[
     province: 'Mỹ Tho',
     region: 'South',
     category: 'spiritual',
-    description:
-        'Ngôi chùa tại Mỹ Tho nổi bật với kiến trúc và các tượng Phật lớn.',
+    description: 'A pagoda in Mỹ Tho known for its architecture and large Buddha statues.',
     position: LatLng(10.36287, 106.37354),
     imageFile: 'Budai.jpg',
     imageAuthor: 'Milei.vencel',
@@ -725,7 +728,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Vinh_Trang_Temple',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'vinh_nghiem',
@@ -734,7 +737,7 @@ const placeSeed = <TourismPlace>[
     province: 'TP.HCM',
     region: 'South',
     category: 'spiritual',
-    description: 'Ngôi chùa tại Thành phố Hồ Chí Minh với tháp bảy tầng.',
+    description: 'A pagoda in Ho Chi Minh City with a seven-story tower.',
     position: LatLng(10.7904, 106.6823),
     imageFile: 'Chua Vinh nghiem, tphcm vietnam - panoramio (1).jpg',
     imageAuthor: 'trungydang',
@@ -742,7 +745,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by/3.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/V%C4%A9nh_Nghi%C3%AAm_Pagoda,_Ho_Chi_Minh_City',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'ba_den',
@@ -750,8 +753,7 @@ const placeSeed = <TourismPlace>[
     province: 'Tây Ninh',
     region: 'South',
     category: 'nature',
-    description:
-        'Ngọn núi nổi tiếng của Tây Ninh với cảnh quan và quần thể chùa.',
+    description: 'A well-known mountain in Tây Ninh with scenic views and a complex of pagodas.',
     position: LatLng(11.367, 106.167),
     imageFile: 'Aerial tram in Black Virgin Mountain.jpg',
     imageAuthor: 'Baoothersks',
@@ -759,7 +761,7 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Black_Virgin_Mountain',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
   TourismPlace(
     id: 'nha_tu_pq',
@@ -768,7 +770,7 @@ const placeSeed = <TourismPlace>[
     province: 'Phú Quốc',
     region: 'South',
     category: 'culture',
-    description: 'Di tích nhà tù tại phía nam đảo Phú Quốc.',
+    description: 'A historic prison site in the south of Phú Quốc Island.',
     position: LatLng(10.043948, 104.018179),
     imageFile: 'Gefängnisanlage auf Phu Quoc "Coconut Tree Prison".jpg',
     imageAuthor: 'RolfBerndArnold',
@@ -776,6 +778,6 @@ const placeSeed = <TourismPlace>[
     imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0',
     sourceUrl: 'https://en.wikipedia.org/wiki/Ph%C3%BA_Qu%E1%BB%91c_Prison',
     coordinateNote:
-        'Điểm tham chiếu địa danh lấy từ nguồn; không mặc định là cổng vào.',
+        'Reference point from the source. It may differ from the entrance.',
   ),
 ];

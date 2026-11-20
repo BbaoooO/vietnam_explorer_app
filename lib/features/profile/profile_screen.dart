@@ -29,7 +29,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _enableNotifications = true;
   bool _enableDarkMode = false;
   String _selectedCurrency = 'VND (₫)';
-  String _selectedLanguage = 'English';
 
   @override
   void initState() {
@@ -246,16 +245,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             height: MediaQuery.sizeOf(sheetContext).height * 0.65,
             child: Column(
               children: [
-                Text('Đã lưu (${data.favorites.length})', style: Theme.of(sheetContext).textTheme.titleLarge),
+                Text('Saved (${data.favorites.length})', style: Theme.of(sheetContext).textTheme.titleLarge),
                 if (data.canImportLegacyFavorites)
                   TextButton.icon(
                     onPressed: () => _importLegacyFavorites(sheetContext, data),
                     icon: const Icon(Icons.restore),
-                    label: const Text('Nhập địa điểm đã lưu từ bản cũ'),
+                    label: const Text('Import previously saved places'),
                   ),
                 Expanded(
                   child: data.favorites.isEmpty
-                      ? const Center(child: Text('Bạn chưa lưu địa điểm nào.'))
+                      ? const Center(child: Text('You have no saved places yet.'))
                       : ListView(
                           children: [
                             for (final target in data.favorites)
@@ -268,12 +267,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   navigation.openMap(target);
                                 },
                                 trailing: IconButton(
-                                  tooltip: 'Bỏ lưu',
+                                  tooltip: 'Remove from saved places',
                                   onPressed: () async {
                                     try {
                                       await data.setFavorite(target, false);
                                     } catch (_) {
-                                      if (mounted) _showMessage('Chưa bỏ lưu được địa điểm.', isError: true);
+                                      if (mounted) _showMessage('Could not remove the saved place.', isError: true);
                                     }
                                   },
                                   icon: const Icon(Icons.bookmark_remove_outlined),
@@ -294,20 +293,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Nhập địa điểm đã lưu?'),
-        content: const Text('Bản cũ lưu chung trên thiết bị. Chỉ nhập nếu danh sách đó là của bạn. Các địa điểm sẽ được thêm vào tài khoản đang đăng nhập.'),
+        title: const Text('Import saved places?'),
+        content: const Text('The previous version stored places on this device. Import this list only if it belongs to you. Places will be added to your current account.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Nhập')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Import')),
         ],
       ),
     );
     if (!mounted || confirmed != true) return;
     try {
       await data.importLegacyFavorites();
-      if (mounted) _showMessage('Đã nhập địa điểm đã lưu.');
+      if (mounted) _showMessage('Saved places imported.');
     } catch (_) {
-      if (mounted) _showMessage('Chưa nhập được địa điểm.', isError: true);
+      if (mounted) _showMessage('Could not import your saved places.', isError: true);
     }
   }
 
@@ -382,21 +381,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                     ),
                   ),
-                  ListTile(
-                    title: const Text('Language'),
-                    trailing: DropdownButton<String>(
-                      value: _selectedLanguage,
-                      underline: const SizedBox(),
-                      items: ['English', 'Tiếng Việt'].map((lang) {
-                        return DropdownMenuItem(value: lang, child: Text(lang));
-                      }).toList(),
-                      onChanged: (val) {
-                        if (val != null) {
-                          setModalState(() => _selectedLanguage = val);
-                          setState(() {});
-                        }
-                      },
-                    ),
+                  const ListTile(
+                    title: Text('Language'),
+                    trailing: Text('English'),
                   ),
                 ],
               ),
@@ -451,7 +438,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Padding(
                             padding: EdgeInsets.all(12.0),
                             child: Text(
-                              'Tạo chuyến đi trong Trip Planner, rồi chọn Thêm hoạt động.',
+                              'Create a trip in Trip Planner, then select Add activity.',
                               style: TextStyle(color: Colors.black87),
                             ),
                           ),
@@ -463,7 +450,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Padding(
                             padding: EdgeInsets.all(12.0),
                             child: Text(
-                              'Mở một địa danh trên bản đồ và chọn Đánh dấu đã đến để thêm dấu vào hộ chiếu.',
+                              'Open a place on the map and select Mark as visited to add a passport stamp.',
                               style: TextStyle(color: Colors.black87),
                             ),
                           ),
@@ -475,7 +462,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Padding(
                             padding: EdgeInsets.all(12.0),
                             child: Text(
-                              'Lịch trình và các địa điểm đã lưu được lưu trên thiết bị. Bản đồ và ảnh trực tuyến vẫn có thể cần kết nối mạng.',
+                              'Your itinerary and saved places are available on this device. Maps and online photos may need an internet connection.',
                               style: TextStyle(color: Colors.black87),
                             ),
                           ),
@@ -661,7 +648,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: _buildStatCard(
               icon: Icons.map,
               value: '${data.visitedAreas.length}',
-              label: 'Khu vực',
+              label: 'Areas',
             ),
           ),
           const SizedBox(width: 16),
@@ -669,7 +656,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: _buildStatCard(
               icon: Icons.verified,
               value: '${data.visits.length}',
-              label: 'Dấu hộ chiếu',
+              label: 'Passport stamps',
             ),
           ),
         ],
@@ -750,7 +737,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 true, onTap: _showPersonalDetailsSheet),
             _buildMenuItem(context, Icons.favorite_border,
                 'Saved Destinations', true, onTap: _showSavedDestinationsSheet),
-            _buildMenuItem(context, Icons.confirmation_number_outlined, 'Vé của tôi',
+            _buildMenuItem(context, Icons.confirmation_number_outlined, 'My Tickets',
                 true, onTap: _openMyTickets),
             _buildMenuItem(context, Icons.settings_outlined, 'Settings', true,
                 onTap: _showSettingsSheet),

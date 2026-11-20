@@ -130,7 +130,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Chưa cập nhật được địa điểm đã lưu.')),
+        const SnackBar(content: Text('Could not update your saved places.')),
       );
     }
   }
@@ -276,7 +276,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                 ),
                 if (places.isNotEmpty) ...[
                   const SizedBox(height: 20),
-                  Text('Địa danh tại ${item.title}', style: Theme.of(context).textTheme.titleMedium),
+                  Text('Places in ${item.title}', style: Theme.of(context).textTheme.titleMedium),
                   for (final place in places)
                     ListTile(
                       contentPadding: EdgeInsets.zero,
@@ -367,7 +367,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                       ));
                     },
                     icon: const Icon(Icons.confirmation_number_outlined),
-                    label: const Text('Đặt vé'),
+                    label: const Text('Book tickets'),
                     style: FilledButton.styleFrom(
                       backgroundColor: _primary,
                       minimumSize: const Size.fromHeight(52),
@@ -385,7 +385,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                     minimumSize: const Size.fromHeight(52),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: const Text('Thêm vào lịch trình'),
+                  child: const Text('Add to Planner'),
                 ),
               ],
             ),
@@ -428,7 +428,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                 if (destinations.isEmpty && places.isEmpty)
                   const SliverFillRemaining(
                     hasScrollBody: false,
-                    child: Center(child: Text('Bạn chưa lưu địa điểm nào.')),
+                    child: Center(child: Text('You have no saved places yet.')),
                   ),
                 if (destinations.isNotEmpty)
                   SliverPadding(
@@ -453,7 +453,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                           title: Text(place.name),
                           subtitle: Text(place.province),
                           trailing: IconButton(
-                            tooltip: 'Bỏ lưu',
+                            tooltip: 'Remove from saved places',
                             icon: const Icon(Icons.bookmark_remove_outlined),
                             onPressed: () => _toggleSaved(placeRef(place.id), saved: false),
                           ),

@@ -19,7 +19,7 @@ class PassportScreen extends StatefulWidget {
 
 class _PassportScreenState extends State<PassportScreen> {
   // Trạng thái bộ lọc hiện tại
-  String _selectedFilter = 'Tất cả';
+  String _selectedFilter = 'All';
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +121,7 @@ class _PassportScreenState extends State<PassportScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Mã số: ${widget.profile.passportId}',
+                      'Passport ID: ${widget.profile.passportId}',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.85),
                         fontSize: 13,
@@ -135,7 +135,7 @@ class _PassportScreenState extends State<PassportScreen> {
                 icon: const Icon(Icons.share_rounded, color: Colors.white),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Đang tạo ảnh chia sẻ thành tích...')),
+                    const SnackBar(content: Text('Preparing your achievement to share…')),
                   );
                 },
               ),
@@ -393,7 +393,7 @@ class _PassportScreenState extends State<PassportScreen> {
 
   // --- Chức năng lọc: Thanh UI để chọn bộ lọc ---
   Widget _buildFilterBar() {
-    final filters = ['Tất cả', 'Đã đến', 'Chưa đến'];
+    final filters = ['All', 'Visited', 'Not visited'];
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -428,8 +428,8 @@ class _PassportScreenState extends State<PassportScreen> {
   Widget _buildStampsGrid(BuildContext context) {
     // Lọc danh sách stamps dựa vào biến trạng thái
     List<PassportStamp> filteredStamps = widget.profile.stamps.where((stamp) {
-      if (_selectedFilter == 'Đã đến') return stamp.isUnlocked;
-      if (_selectedFilter == 'Chưa đến') return !stamp.isUnlocked;
+      if (_selectedFilter == 'Visited') return stamp.isUnlocked;
+      if (_selectedFilter == 'Not visited') return !stamp.isUnlocked;
       return true; // "Tất cả"
     }).toList();
 

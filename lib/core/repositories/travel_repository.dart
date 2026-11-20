@@ -36,13 +36,14 @@ class TravelRepository {
     return _factory.openDatabase(
       file,
       options: OpenDatabaseOptions(
-        version: 4,
+        version: 5,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
         onCreate: _create,
         onUpgrade: (db, from, _) async {
           if (from < 2) await _createBookingSchema(db);
           if (from < 3) await _addBookingPaymentMethod(db);
           if (from < 4) await _addCheckoutConfirmation(db);
+          if (from < 5) await _migrateEnglishContent(db);
         },
       ),
     );
@@ -128,6 +129,23 @@ class TravelRepository {
     for (final statement in bookingCheckoutSchema) {
       await db.execute(statement);
     }
+  }
+
+  Future<void> _migrateEnglishContent(Database db) async {
+    final batch = db.batch();
+    for (final place in placeSeed) {
+      batch.update(
+        'places',
+        {
+          'description': place.description,
+          'coordinate_note': place.coordinateNote,
+        },
+        where: 'id = ?',
+        whereArgs: [place.id],
+      );
+    }
+    batch.execute(englishBookingNotesMigration);
+    await batch.commit(noResult: true);
   }
 
   Future<List<Map<String, Object?>>> _bookingRows(
@@ -227,7 +245,9 @@ class TravelRepository {
         'booking_id': booking.id,
         'place_id': booking.placeId,
         'title': booking.title,
-        'notes': 'Mã vé ${booking.id} · ${booking.guests} khách',
+        'notes':
+            'Ticket reference: ${booking.id} · '
+            '${booking.guests} guest${booking.guests == 1 ? '' : 's'}',
         'day': booking.day,
         'minute': booking.minute,
         'cost_vnd': booking.totalVnd,

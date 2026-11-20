@@ -18,10 +18,10 @@ class PlaceVisitPanel extends StatelessWidget {
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Mô tả',
+          Text('Description',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           SizedBox(height: 8),
-          Text('Sẽ cập nhật sau'),
+          Text('Details coming soon'),
         ],
       ),
     );

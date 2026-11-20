@@ -99,12 +99,12 @@ class _MapPlacePickerState extends State<MapPlacePicker> {
                 }
               },
               decoration: InputDecoration(
-                hintText: 'Tên địa điểm du lịch, tỉnh/thành…',
+                hintText: 'Search by place, city, or province…',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: query.isEmpty
                     ? null
                     : IconButton(
-                        tooltip: 'Xóa từ khóa',
+                        tooltip: 'Clear search',
                         onPressed: () => setState(_controller.clear),
                         icon: const Icon(Icons.close),
                       ),
@@ -123,7 +123,7 @@ class _MapPlacePickerState extends State<MapPlacePicker> {
               children: [
 
                 if (query.isEmpty && widget.saved.isNotEmpty) ...[
-                  const _SectionLabel('Đã lưu'),
+                  const _SectionLabel('Saved'),
                   SizedBox(
                     height: 52,
                     child: ListView.separated(
@@ -141,19 +141,19 @@ class _MapPlacePickerState extends State<MapPlacePicker> {
                   ),
                 ],
                 if (query.isEmpty && widget.recent.isNotEmpty) ...[
-                  const _SectionLabel('Gần đây'),
+                  const _SectionLabel('Recent'),
                   for (final place in widget.recent) _place(place, recent: true),
                   const Divider(height: 24),
                 ],
                 _SectionLabel(query.isEmpty
-                    ? 'Gợi ý khám phá'
-                    : '${results.length} địa điểm phù hợp'),
+                    ? 'Suggested places'
+                    : '${results.length} matching places'),
                 if (results.isEmpty)
                   const Padding(
                     padding: EdgeInsets.all(28),
                     child: Text(
-                      'Chưa tìm thấy trong danh sách du lịch của ứng dụng. '
-                      'Thử tên địa danh hoặc tỉnh/thành khác.',
+                      'No matching places found. '
+                      'Try a different place, city, or province.',
                       textAlign: TextAlign.center,
                     ),
                   ),

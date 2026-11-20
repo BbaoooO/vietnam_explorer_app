@@ -98,9 +98,9 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     setState(() => _saving = true);
     try {
       await _data.setFavorite(target, saved);
-      message(saved ? 'Đã lưu địa điểm.' : 'Đã bỏ lưu địa điểm.');
+      message(saved ? 'Place saved.' : 'Place removed from saved places.');
     } catch (_) {
-      message('Chưa lưu được địa điểm. Hãy thử lại.');
+      message('Could not save this place. Please try again.');
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -111,9 +111,9 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     setState(() => _recordingVisit = true);
     try {
       await _data.recordVisit(place.id);
-      message('Đã thêm dấu vào hộ chiếu.');
+      message('Stamp added to your passport.');
     } catch (_) {
-      message('Chưa ghi nhận được lượt ghé thăm.');
+      message('Could not record your visit.');
     } finally {
       if (mounted) setState(() => _recordingVisit = false);
     }
@@ -157,7 +157,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     _openingSearch = true;
     final result = await Navigator.push<RouteLocation>(context,
       MaterialPageRoute(builder: (_) => MapPlacePicker(
-        title: 'Tìm địa điểm',
+        title: 'Find a place',
         places: filteredPlaces,
         recent: _recentPlaces.where(_inScope).toList(),
         saved: _savedPlaces.where(_inScope).toList(),
@@ -235,7 +235,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
               child: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             ),
             Expanded(child: places.isEmpty
-              ? const Center(child: Text('Không có địa điểm để hiển thị.'))
+              ? const Center(child: Text('No places to show.'))
               : ListView.separated(
                 itemCount: places.length,
                 separatorBuilder: (_, _) => const Divider(height: 1, indent: 72),
@@ -273,7 +273,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
           builder: (_, _) => SizedBox(
             height: MediaQuery.sizeOf(sheetContext).height * .5,
             child: data.favorites.isEmpty
-                ? const Center(child: Text('Bạn chưa lưu địa điểm nào.'))
+                ? const Center(child: Text('You have no saved places yet.'))
                 : ListView(
                     children: [
                       for (final target in data.favorites)
@@ -301,13 +301,13 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
       final point = await getMapLocation();
       if (!mounted) return;
       if (!vnBounds.contains(point)) {
-        message('Vị trí hiện tại nằm ngoài khu vực bản đồ Việt Nam.');
+        message('Your current location is outside the Vietnam map area.');
         return;
       }
       setState(() => _userPosition = point);
       await map?.animateCamera(CameraUpdate.newLatLngZoom(point, 15));
     } catch (error) {
-      message(error is MapRoutesException ? error.message : 'Chưa lấy được vị trí. Hãy thử lại.');
+      message(error is MapRoutesException ? error.message : 'Could not find your location. Please try again.');
     } finally {
       if (mounted) setState(() => _locating = false);
     }
@@ -325,9 +325,9 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
         mode: LaunchMode.externalApplication,
       );
 
-      if (!opened) message('Chưa mở được Google Maps.');
+      if (!opened) message('Could not open Google Maps.');
     } catch (_) {
-      message('Chưa mở được Google Maps.');
+      message('Could not open Google Maps.');
     }
   }
   void changeZoom(double delta) => map?.animateCamera(
@@ -360,12 +360,12 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
 
   String categoryLabel(String value) {
     return switch (value) {
-      'culture' => 'Văn hóa',
-      'nature' => 'Thiên nhiên',
-      'spiritual' => 'Tâm linh',
-      'beach' => 'Biển đảo',
-      'food' => 'Ẩm thực',
-      _ => 'Địa điểm du lịch',
+      'culture' => 'Culture',
+      'nature' => 'Nature',
+      'spiritual' => 'Spiritual sites',
+      'beach' => 'Beaches and islands',
+      'food' => 'Food',
+      _ => 'Attractions',
     };
   }
 
@@ -453,7 +453,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
         );
 
         if (bytes == null) {
-          throw StateError('Không tạo được ảnh pin.');
+          throw StateError('Could not render the map pin.');
         }
 
         final descriptor = BitmapDescriptor.bytes(
@@ -538,7 +538,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
               icon: icon,
               infoWindow: InfoWindow(
                 title: entry.key,
-                snippet: '${group.length} địa điểm',
+                snippet: '${group.length} places',
               ),
               onTap: () {
                 hideKeyboard();
@@ -584,7 +584,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
       }
     } catch (_) {
       if (mounted && version == markerVersion) {
-        message('Chưa tạo được pin. Thử zoom lại.');
+        message('Could not show the map pins. Try changing the zoom.');
       }
     }
   }
@@ -627,16 +627,16 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
               Icon(_selectedPlace == null ? Icons.search : Icons.place, color: green, size: 27),
               const SizedBox(width: 12),
               Expanded(child: Text(
-                _selectedPlace?.name ?? _destination?.title ?? 'Tìm địa điểm ở Việt Nam',
+                _selectedPlace?.name ?? _destination?.title ?? 'Find places in Vietnam',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 16, color: _selectedPlace == null ? Colors.black54 : Colors.black87),
               )),
               if (_selectedPlace != null)
-                IconButton(tooltip: 'Đóng địa điểm', onPressed: _closePlace, icon: const Icon(Icons.close))
+                IconButton(tooltip: 'Close place details', onPressed: _closePlace, icon: const Icon(Icons.close))
               else
                 IconButton(
-                  tooltip: 'Địa điểm đã lưu',
+                  tooltip: 'Saved places',
                   onPressed: _showSavedCatalog,
                   icon: const Icon(Icons.bookmark_outline, color: green),
                 ),
@@ -654,7 +654,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
               onDeleted: () => selectRegion('All'),
             ),
             IconButton(
-              tooltip: 'Lưu hoặc bỏ lưu điểm đến',
+              tooltip: 'Save or remove destination',
               onPressed: _saving ? null : () => _toggleSaved(destinationRef(_destination!.id)),
               icon: Icon(_data.favorites.contains(destinationRef(_destination!.id))
                   ? Icons.bookmark : Icons.bookmark_outline),
@@ -713,11 +713,11 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Expanded(child: Text(place.name, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w700))),
             IconButton(
-              tooltip: saved ? 'Bỏ lưu' : 'Lưu địa điểm',
+              tooltip: saved ? 'Remove from saved places' : 'Save place',
               onPressed: _saving ? null : () => _toggleSaved(placeRef(place.id)),
               icon: Icon(saved ? Icons.bookmark : Icons.bookmark_border, color: green),
             ),
-            IconButton(tooltip: 'Đóng', onPressed: _closePlace, icon: const Icon(Icons.close)),
+            IconButton(tooltip: 'Close', onPressed: _closePlace, icon: const Icon(Icons.close)),
           ]),
           Text(place.province, style: const TextStyle(color: Colors.black54, fontSize: 14)),
           const SizedBox(height: 6),
@@ -732,23 +732,23 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
               style: FilledButton.styleFrom(backgroundColor: _teal, padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12)),
               onPressed: () => _openGoogleMaps(place),
               icon: const Icon(Icons.directions, size: 20),
-              label: const Text('Đường đi'),
+              label: const Text('Directions'),
 
             ),
             OutlinedButton.icon(
               onPressed: _saving ? null : () => _toggleSaved(placeRef(place.id)),
               icon: Icon(saved ? Icons.bookmark : Icons.bookmark_outline, size: 18),
-              label: Text(saved ? 'Đã lưu' : 'Lưu'),
+              label: Text(saved ? 'Saved' : 'Save'),
             ),
             OutlinedButton.icon(
               onPressed: () => _nav.openPlanner((title: place.name, target: placeRef(place.id))),
               icon: const Icon(Icons.event_available_outlined, size: 18),
-              label: const Text('Thêm vào lịch trình'),
+              label: const Text('Add to Planner'),
             ),
             OutlinedButton.icon(
               onPressed: visited || _recordingVisit ? null : () => _recordVisit(place),
               icon: Icon(visited ? Icons.check_circle : Icons.flag_outlined, size: 18),
-              label: Text(visited ? 'Đã đến' : 'Đánh dấu đã đến'),
+              label: Text(visited ? 'Visited' : 'Mark as visited'),
             ),
           ]),
           const SizedBox(height: 18),
@@ -759,7 +759,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
           PlacePhoto(place: place),
           if (nearby.isNotEmpty) ...[
             const SizedBox(height: 22),
-            const Text('Khám phá cùng tỉnh / thành', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+            const Text('More places in this area', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
             const SizedBox(height: 10),
             SizedBox(height: 94, child: ListView.separated(
               scrollDirection: Axis.horizontal,
@@ -798,7 +798,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
     child: InkWell(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      onTap: () => showPlacesList(filteredPlaces, title: _destination?.title ?? 'Khám phá ${regions[region]!.toLowerCase()}'),
+      onTap: () => showPlacesList(filteredPlaces, title: _destination?.title ?? (region == 'All' ? 'Explore Vietnam' : 'Explore ${regions[region]} Vietnam')),
       child: SafeArea(top: false, child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 18),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -808,12 +808,12 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
             const Icon(Icons.explore_outlined, color: green, size: 28),
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('Khám phá Việt Nam', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700)),
+              const Text('Explore Vietnam', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700)),
               const SizedBox(height: 4),
               Text(
                 filteredPlaces.isEmpty && _destination != null
-                    ? 'Chưa có địa danh trong danh mục cho điểm đến này.'
-                    : '${filteredPlaces.length} địa điểm · ${_destination?.title ?? regions[region]}',
+                    ? 'No places are listed for this destination yet.'
+                    : '${filteredPlaces.length} places · ${_destination?.title ?? regions[region]}',
                 style: const TextStyle(color: Colors.black54),
               ),
             ])),
@@ -844,7 +844,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
               markerId: const MarkerId('user:position'),
               position: _userPosition!,
               icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-              infoWindow: const InfoWindow(title: 'Vị trí của bạn'),
+              infoWindow: const InfoWindow(title: 'Your location'),
             ),
           },
           mapToolbarEnabled: false,
@@ -876,10 +876,10 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
             bottom: bottomPanel + 16,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               if (showZoomButtons) ...[
-                _roundButton(tooltip: 'Phóng to', icon: Icons.add, onPressed: () => changeZoom(1)),
-                _roundButton(tooltip: 'Thu nhỏ', icon: Icons.remove, onPressed: () => changeZoom(-1)),
+                _roundButton(tooltip: 'Zoom in', icon: Icons.add, onPressed: () => changeZoom(1)),
+                _roundButton(tooltip: 'Zoom out', icon: Icons.remove, onPressed: () => changeZoom(-1)),
               ],
-              _roundButton(tooltip: _locating ? 'Đang lấy vị trí…' : 'Vị trí của bạn', icon: _locating ? Icons.hourglass_top : Icons.my_location, onPressed: _locate),
+              _roundButton(tooltip: _locating ? 'Finding your location…' : 'Your location', icon: _locating ? Icons.hourglass_top : Icons.my_location, onPressed: _locate),
             ]),
           ),
         if (place == null)

@@ -8,7 +8,7 @@ import 'map_exception.dart';
 Future<LatLng> getMapLocation() async {
   if (!await Geolocator.isLocationServiceEnabled()) {
     throw const MapRoutesException(
-      'Hãy bật GPS hoặc chọn một địa điểm làm điểm đi.',
+      'Turn on location services or choose a starting point.',
     );
   }
   var permission = await Geolocator.checkPermission();
@@ -17,12 +17,12 @@ Future<LatLng> getMapLocation() async {
   }
   if (permission == LocationPermission.deniedForever) {
     throw const MapRoutesException(
-      'Quyền vị trí đang bị tắt. Bật trong Cài đặt hoặc chọn điểm đi khác.',
+      'Allow location access in Settings or choose another starting point.',
     );
   }
   if (permission == LocationPermission.denied) {
     throw const MapRoutesException(
-      'Chưa có quyền vị trí. Bạn có thể chọn một địa điểm làm điểm đi.',
+      'Location access is needed. You can also choose a starting point.',
     );
   }
   try {
@@ -35,7 +35,7 @@ Future<LatLng> getMapLocation() async {
     return LatLng(position.latitude, position.longitude);
   } on TimeoutException {
     throw const MapRoutesException(
-      'Chưa xác định được vị trí. Thử lại hoặc chọn điểm đi khác.',
+      'Could not find your location. Try again or choose another starting point.',
     );
   }
 }
