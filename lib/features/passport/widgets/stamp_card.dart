@@ -10,6 +10,8 @@ class StampCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final locked = !stamp.isUnlocked;
+    final date = stamp.visitedDate;
+    final formattedDate = date == null ? '' : '${date.day}/${date.month}/${date.year}';
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
@@ -27,7 +29,7 @@ class StampCard extends StatelessWidget {
             context: context,
             builder: (context) => AlertDialog(
               title: Text(stamp.placeName),
-              content: Text('Kỷ niệm tuyệt vời của bạn tại ${stamp.province} vào ngày ${stamp.visitedDate.day}/${stamp.visitedDate.month}/${stamp.visitedDate.year}.'),
+              content: Text('Kỷ niệm tuyệt vời của bạn tại ${stamp.province} vào ngày $formattedDate.'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
@@ -57,7 +59,13 @@ class StampCard extends StatelessWidget {
                     ? const ColorFilter.mode(Colors.grey, BlendMode.saturation)
                     : const ColorFilter.mode(
                     Colors.transparent, BlendMode.multiply),
-                child: Image.network(stamp.imageUrl, fit: BoxFit.cover),
+                child: stamp.imageUrl.isEmpty
+                    ? const ColoredBox(color: Color(0xFF536C62))
+                    : Image.network(
+                        stamp.imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF536C62)),
+                      ),
               ),
               Container(
                 decoration: BoxDecoration(
@@ -98,7 +106,7 @@ class StampCard extends StatelessWidget {
                       style: TextStyle(
                           color: Colors.white.withOpacity(0.8), fontSize: 11),
                     ),
-                    if (!locked) ...[
+                    if (!locked && date != null) ...[
                       const SizedBox(height: 4),
                       Row(
                         children: [
@@ -106,7 +114,7 @@ class StampCard extends StatelessWidget {
                               color: AppTheme.secondaryColor, size: 13),
                           const SizedBox(width: 4),
                           Text(
-                            '${stamp.visitedDate.day}/${stamp.visitedDate.month}/${stamp.visitedDate.year}',
+                            '$formattedDate',
                             style: const TextStyle(
                                 color: Color(0xFFFCE9A8), fontSize: 10),
                           ),

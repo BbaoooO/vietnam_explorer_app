@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../data/tourism_places.dart';
+import '../../../core/models/tourism_place.dart';
 
 class PlacePhoto extends StatelessWidget {
   const PlacePhoto({super.key, required this.place});

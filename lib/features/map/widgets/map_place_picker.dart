@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../data/tourism_places.dart';
+import '../../../core/models/tourism_place.dart';
 import '../models/place_selection.dart';
 
 String normalizeMapSearch(String value) {
@@ -29,7 +29,7 @@ class MapPlacePicker extends StatefulWidget {
   const MapPlacePicker({
     super.key,
     required this.title,
-    this.places = tourismPlaces,
+    required this.places,
     this.recent = const [],
     this.saved = const [],
   });

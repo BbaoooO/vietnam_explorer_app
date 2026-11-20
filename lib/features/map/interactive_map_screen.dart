@@ -1,10 +1,13 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/app_nav.dart';
-import 'data/tourism_places.dart';
+import '../../core/models/destination.dart';
+import '../../core/models/travel_records.dart';
+import '../../core/providers/travel_data.dart';
+import '../../core/models/tourism_place.dart';
 import 'models/place_selection.dart';
 import 'services/map_location_service.dart';
 import 'services/map_exception.dart';
@@ -21,8 +24,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
   static const green = Color(0xFF0F4C3A);
   static const _teal = Color(0xFF087F8C);
   static const detailZoom = 12.0;
-  static const _savedKey = 'map_saved_place_ids';
-  static const _recentKey = 'map_recent_place_ids';
   static final vnBounds = LatLngBounds(
     southwest: const LatLng(8, 102),
     northeast: const LatLng(24, 118),
@@ -34,10 +35,11 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     'South': 'South',
   };
 
-  final searchController = TextEditingController();
   final iconCache = <String, BitmapDescriptor>{};
-  final _savedIds = <String>{};
-  final _recentIds = <String>[];
+  late final AppNav _nav;
+  TravelData get _data => context.read<TravelData>();
+  List<TourismPlace> get _catalog => _data.places;
+  Destination? _destination;
   GoogleMapController? map;
   Set<Marker> markers = {};
   LatLng center = const LatLng(16, 106);
@@ -48,44 +50,29 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
   LatLng? _userPosition;
   bool _locating = false;
   bool _saving = false;
+  bool _recordingVisit = false;
   bool _openingSearch = false;
   double _sheetExtent = .48;
 
-  List<TourismPlace> get _savedPlaces => tourismPlaces
-      .where((place) => _savedIds.contains(place.id)).toList();
+  List<TourismPlace> get _savedPlaces => _catalog
+      .where((place) => _data.favorites.contains(placeRef(place.id))).toList();
   List<TourismPlace> get _recentPlaces => [
-    for (final id in _recentIds)
-      for (final place in tourismPlaces)
-        if (place.id == id) place,
+    for (final id in _data.recent)
+      if (_data.place(id) case final place?) place,
   ];
 
   @override
   void initState() {
     super.initState();
-    _loadPreferences();
-    AppNav.mapFocusId.addListener(_focusFromHome);
+    _nav = context.read<AppNav>();
+    _nav.mapFocus.addListener(_focusFromHome);
   }
 
   @override
   void dispose() {
     markerVersion++;
-    AppNav.mapFocusId.removeListener(_focusFromHome);
-    searchController.dispose();
-    map?.dispose();
+    _nav.mapFocus.removeListener(_focusFromHome);
     super.dispose();
-  }
-
-  Future<void> _loadPreferences() async {
-    try {
-      final preferences = await SharedPreferences.getInstance();
-      if (!mounted) return;
-      setState(() {
-        _savedIds.addAll(preferences.getStringList(_savedKey) ?? []);
-        _recentIds.addAll(preferences.getStringList(_recentKey) ?? []);
-      });
-    } catch (_) {
-      // Map browsing remains available if local preferences are unavailable.
-    }
   }
 
   void message(String value) {
@@ -98,32 +85,20 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
   void hideKeyboard() => FocusScope.of(context).unfocus();
 
   Future<void> _remember(TourismPlace place) async {
-    _recentIds.remove(place.id);
-    _recentIds.insert(0, place.id);
-    if (_recentIds.length > 10) _recentIds.removeRange(10, _recentIds.length);
     try {
-      final preferences = await SharedPreferences.getInstance();
-      await preferences.setStringList(_recentKey, List.of(_recentIds));
+      await _data.rememberPlace(place.id);
     } catch (_) {
-      // Keep history available for the current session.
+      // The selected place remains available when history cannot be saved.
     }
   }
 
-  Future<void> _toggleSaved(TourismPlace place) async {
+  Future<void> _toggleSaved(CatalogRef target) async {
     if (_saving) return;
+    final saved = !_data.favorites.contains(target);
     setState(() => _saving = true);
-    final next = Set<String>.of(_savedIds);
-    final removed = next.remove(place.id);
-    if (!removed) next.add(place.id);
     try {
-      final preferences = await SharedPreferences.getInstance();
-      final success = await preferences.setStringList(_savedKey, next.toList());
-      if (!success) throw StateError('Unable to save preferences');
-      if (!mounted) return;
-      setState(() {
-        _savedIds..clear()..addAll(next);
-      });
-      message(removed ? 'Đã bỏ lưu địa điểm.' : 'Đã lưu địa điểm.');
+      await _data.setFavorite(target, saved);
+      message(saved ? 'Đã lưu địa điểm.' : 'Đã bỏ lưu địa điểm.');
     } catch (_) {
       message('Chưa lưu được địa điểm. Hãy thử lại.');
     } finally {
@@ -131,27 +106,51 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     }
   }
 
-  void _focusFromHome() {
-    final id = AppNav.mapFocusId.value;
-    if (map == null || id == null) return;
-    for (final place in tourismPlaces) {
-      if (place.id == id) {
-        AppNav.mapFocusId.value = null;
-        showPlace(place);
-        return;
-      }
+  Future<void> _recordVisit(TourismPlace place) async {
+    if (_recordingVisit || _data.visits.containsKey(place.id)) return;
+    setState(() => _recordingVisit = true);
+    try {
+      await _data.recordVisit(place.id);
+      message('Đã thêm dấu vào hộ chiếu.');
+    } catch (_) {
+      message('Chưa ghi nhận được lượt ghé thăm.');
+    } finally {
+      if (mounted) setState(() => _recordingVisit = false);
     }
-    AppNav.mapFocusId.value = null;
-    message('Địa điểm này chưa có trong danh sách bản đồ.');
   }
 
-  List<TourismPlace> get filteredPlaces {
-    final keyword = normalizeMapSearch(searchController.text);
-    return tourismPlaces.where((place) {
-      return (region == 'All' || place.region == region) &&
-          normalizeMapSearch('${place.name} ${place.province}').contains(keyword);
-    }).toList();
+  void _focusFromHome() {
+    final target = _nav.mapFocus.value;
+    if (!mounted || map == null || target == null) return;
+    _nav.mapFocus.value = null;
+
+    switch (target.kind) {
+      case CatalogKind.destination:
+        final destination = _data.destination(target.id);
+        if (destination == null) return;
+        markerVersion++;
+        setState(() {
+          _destination = destination;
+          _selectedPlace = null;
+          region = destination.region;
+          center = destination.center;
+          zoom = detailZoom;
+          markers = {};
+        });
+        map?.animateCamera(CameraUpdate.newLatLngZoom(center, zoom));
+        refreshMarkers();
+      case CatalogKind.place:
+        final place = _data.place(target.id);
+        if (place == null) return;
+        showPlace(place);
+    }
   }
+
+  bool _inScope(TourismPlace place) =>
+      (region == 'All' || place.region == region) &&
+      (_destination == null || place.destinationId == _destination!.id);
+
+  List<TourismPlace> get filteredPlaces => _catalog.where(_inScope).toList();
 
   Future<void> showSearchResults() async {
     if (_openingSearch) return;
@@ -159,9 +158,9 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     final result = await Navigator.push<RouteLocation>(context,
       MaterialPageRoute(builder: (_) => MapPlacePicker(
         title: 'Tìm địa điểm',
-        places: tourismPlaces.where((p) => region == 'All' || p.region == region).toList(),
-        recent: _recentPlaces.where((p) => region == 'All' || p.region == region).toList(),
-        saved: _savedPlaces.where((p) => region == 'All' || p.region == region).toList(),
+        places: filteredPlaces,
+        recent: _recentPlaces.where(_inScope).toList(),
+        saved: _savedPlaces.where(_inScope).toList(),
       )),
     );
     _openingSearch = false;
@@ -179,10 +178,10 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     };
     markerVersion++;
     setState(() {
+      _destination = null;
       region = value;
       center = target;
       zoom = value == 'All' ? 5.2 : 7;
-      searchController.clear();
       _selectedPlace = null;
       markers = {};
     });
@@ -195,8 +194,10 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     _remember(place);
     markerVersion++;
     setState(() {
+      if (_destination != null && place.destinationId != _destination!.id) {
+        _destination = null;
+      }
       if (region != 'All' && region != place.region) region = 'All';
-      searchController.text = place.name;
       _selectedPlace = place;
       _sheetExtent = .48;
       center = place.position;
@@ -214,7 +215,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     markerVersion++;
     setState(() {
       _selectedPlace = null;
-      searchController.clear();
       markers = {};
     });
     refreshMarkers();
@@ -235,7 +235,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
               child: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             ),
             Expanded(child: places.isEmpty
-              ? const Center(child: Text('Bạn chưa lưu địa điểm nào.'))
+              ? const Center(child: Text('Không có địa điểm để hiển thị.'))
               : ListView.separated(
                 itemCount: places.length,
                 separatorBuilder: (_, _) => const Divider(height: 1, indent: 72),
@@ -257,6 +257,38 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
                 },
               )),
           ]),
+        ),
+      ),
+    );
+  }
+
+  void _showSavedCatalog() {
+    final data = _data;
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: ListenableBuilder(
+          listenable: data,
+          builder: (_, _) => SizedBox(
+            height: MediaQuery.sizeOf(sheetContext).height * .5,
+            child: data.favorites.isEmpty
+                ? const Center(child: Text('Bạn chưa lưu địa điểm nào.'))
+                : ListView(
+                    children: [
+                      for (final target in data.favorites)
+                        ListTile(
+                          leading: Icon(target.kind == CatalogKind.place
+                              ? Icons.place_outlined : Icons.map_outlined),
+                          title: Text(data.title(target) ?? target.id),
+                          onTap: () {
+                            Navigator.pop(sheetContext);
+                            _nav.openMap(target);
+                          },
+                        ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );
@@ -595,7 +627,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
               Icon(_selectedPlace == null ? Icons.search : Icons.place, color: green, size: 27),
               const SizedBox(width: 12),
               Expanded(child: Text(
-                _selectedPlace?.name ?? 'Tìm địa điểm ở Việt Nam',
+                _selectedPlace?.name ?? _destination?.title ?? 'Tìm địa điểm ở Việt Nam',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 16, color: _selectedPlace == null ? Colors.black54 : Colors.black87),
@@ -605,7 +637,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
               else
                 IconButton(
                   tooltip: 'Địa điểm đã lưu',
-                  onPressed: () => showPlacesList(_savedPlaces, title: 'Địa điểm đã lưu'),
+                  onPressed: _showSavedCatalog,
                   icon: const Icon(Icons.bookmark_outline, color: green),
                 ),
               const SizedBox(width: 6),
@@ -613,6 +645,22 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
           ),
         ),
       ),
+      if (_selectedPlace == null && _destination != null)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            InputChip(
+              label: Text(_destination!.title),
+              onDeleted: () => selectRegion('All'),
+            ),
+            IconButton(
+              tooltip: 'Lưu hoặc bỏ lưu điểm đến',
+              onPressed: _saving ? null : () => _toggleSaved(destinationRef(_destination!.id)),
+              icon: Icon(_data.favorites.contains(destinationRef(_destination!.id))
+                  ? Icons.bookmark : Icons.bookmark_outline),
+            ),
+          ],
+        ),
       if (_selectedPlace == null) ...[
         const SizedBox(height: 12),
         SingleChildScrollView(
@@ -645,8 +693,9 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
   );
 
   Widget _placeDetails(TourismPlace place, ScrollController controller) {
-    final saved = _savedIds.contains(place.id);
-    final nearby = tourismPlaces.where((p) => p.id != place.id && p.province == place.province).take(5).toList();
+    final saved = _data.favorites.contains(placeRef(place.id));
+    final visited = _data.visits.containsKey(place.id);
+    final nearby = _catalog.where((p) => p.id != place.id && p.province == place.province).take(5).toList();
     return Material(
       color: Colors.white,
       elevation: 8,
@@ -665,7 +714,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
             Expanded(child: Text(place.name, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w700))),
             IconButton(
               tooltip: saved ? 'Bỏ lưu' : 'Lưu địa điểm',
-              onPressed: _saving ? null : () => _toggleSaved(place),
+              onPressed: _saving ? null : () => _toggleSaved(placeRef(place.id)),
               icon: Icon(saved ? Icons.bookmark : Icons.bookmark_border, color: green),
             ),
             IconButton(tooltip: 'Đóng', onPressed: _closePlace, icon: const Icon(Icons.close)),
@@ -687,12 +736,26 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
 
             ),
             OutlinedButton.icon(
-              onPressed: _saving ? null : () => _toggleSaved(place),
+              onPressed: _saving ? null : () => _toggleSaved(placeRef(place.id)),
               icon: Icon(saved ? Icons.bookmark : Icons.bookmark_outline, size: 18),
               label: Text(saved ? 'Đã lưu' : 'Lưu'),
             ),
+            OutlinedButton.icon(
+              onPressed: () => _nav.openPlanner((title: place.name, target: placeRef(place.id))),
+              icon: const Icon(Icons.event_available_outlined, size: 18),
+              label: const Text('Thêm vào lịch trình'),
+            ),
+            OutlinedButton.icon(
+              onPressed: visited || _recordingVisit ? null : () => _recordVisit(place),
+              icon: Icon(visited ? Icons.check_circle : Icons.flag_outlined, size: 18),
+              label: Text(visited ? 'Đã đến' : 'Đánh dấu đã đến'),
+            ),
           ]),
           const SizedBox(height: 18),
+          if (place.description.isNotEmpty) ...[
+            Text(place.description),
+            const SizedBox(height: 12),
+          ],
           PlacePhoto(place: place),
           if (nearby.isNotEmpty) ...[
             const SizedBox(height: 22),
@@ -735,7 +798,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
     borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
     child: InkWell(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      onTap: () => showPlacesList(filteredPlaces, title: 'Khám phá ${regions[region]!.toLowerCase()}'),
+      onTap: () => showPlacesList(filteredPlaces, title: _destination?.title ?? 'Khám phá ${regions[region]!.toLowerCase()}'),
       child: SafeArea(top: false, child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 18),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -747,7 +810,12 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('Khám phá Việt Nam', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700)),
               const SizedBox(height: 4),
-              Text('${filteredPlaces.length} địa điểm · ${regions[region]}', style: const TextStyle(color: Colors.black54)),
+              Text(
+                filteredPlaces.isEmpty && _destination != null
+                    ? 'Chưa có địa danh trong danh mục cho điểm đến này.'
+                    : '${filteredPlaces.length} địa điểm · ${_destination?.title ?? regions[region]}',
+                style: const TextStyle(color: Colors.black54),
+              ),
             ])),
             const Icon(Icons.keyboard_arrow_up, color: green),
           ]),
@@ -757,7 +825,9 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
   );
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) {
+    context.watch<TravelData>();
+    return Scaffold(
     body: LayoutBuilder(builder: (context, constraints) {
       final place = _selectedPlace;
       final bottomPanel = place == null ? 124.0 : constraints.maxHeight * _sheetExtent;
@@ -834,5 +904,6 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
           ),
       ]);
     }),
-  );
+    );
+  }
 }

@@ -5,7 +5,7 @@ class TravelerProfile {
   final String fullName;
   final String avatarUrl;
   final String passportId; // Mã số passport, VD: "VN-TRAVELER-000123"
-  final DateTime issueDate;
+  final DateTime? issueDate;
   final int totalDestinations; // Tổng số địa danh trong hệ thống
   final List<PassportStamp> stamps; // Các địa danh đã/chưa ghé thăm
 
@@ -37,7 +37,5 @@ class TravelerProfile {
   double get progress =>
       totalDestinations == 0 ? 0 : visitedCount / totalDestinations;
 
-  double get xpProgress =>
-      xpToNextLevel == 0 ? 0 : currentXP / xpToNextLevel;
+  double get xpProgress => xpToNextLevel == 0 ? 0 : currentXP / xpToNextLevel;
 }
-

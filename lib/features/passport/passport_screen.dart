@@ -1,23 +1,84 @@
 import '../../core/explorer_app_bar.dart';
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
-import 'data/collection_book_data.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+
+import '../../core/providers/travel_data.dart';
+import 'models/province_stamp.dart';
 import 'models/traveler_profile.dart';
 import 'models/passport_stamp.dart';
 import 'widgets/province_badge_card.dart';
 import 'widgets/stamp_card.dart';
 
-/// Màn hình "Hộ chiếu du lịch số"
-class PassportScreen extends StatefulWidget {
-  final TravelerProfile profile;
-
-  const PassportScreen({super.key, required this.profile});
+class PassportScreen extends StatelessWidget {
+  const PassportScreen({super.key});
 
   @override
-  State<PassportScreen> createState() => _PassportScreenState();
+  Widget build(BuildContext context) {
+    final data = context.watch<TravelData>();
+    final visitCount = data.visits.length;
+    final level = visitCount ~/ 5 + 1;
+    final allAreas = data.places.map((place) => place.province).toSet();
+    final visitedAreas = data.visitedAreas.toList()..sort();
+
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.userChanges(),
+      initialData: FirebaseAuth.instance.currentUser,
+      builder: (context, snapshot) {
+        final user = snapshot.data;
+        final name = user?.displayName?.trim();
+        return _PassportView(
+          profile: TravelerProfile(
+            fullName: name == null || name.isEmpty
+                ? user?.email ?? 'Explorer'
+                : name,
+            avatarUrl: user?.photoURL ?? '',
+            passportId: data.uid.substring(0, data.uid.length < 8 ? data.uid.length : 8).toUpperCase(),
+            issueDate: user?.metadata.creationTime?.toLocal(),
+            totalDestinations: data.places.length,
+            levelNumber: level,
+            levelTitle: level == 1 ? 'New Explorer' : 'Explorer',
+            currentXP: visitCount * 100,
+            xpToNextLevel: level * 500,
+            stamps: [
+              for (final place in data.places)
+                PassportStamp(
+                  placeName: place.name,
+                  province: place.province,
+                  imageUrl: place.imageUrl,
+                  visitedDate: data.visits[place.id],
+                  isUnlocked: data.visits.containsKey(place.id),
+                ),
+            ],
+          ),
+          collection: [
+            for (final area in visitedAreas)
+              ProvinceStamp(name: area, tagline: 'Đã khám phá'),
+          ],
+          totalAreas: allAreas.length,
+        );
+      },
+    );
+  }
 }
 
-class _PassportScreenState extends State<PassportScreen> {
+class _PassportView extends StatefulWidget {
+  const _PassportView({
+    required this.profile,
+    required this.collection,
+    required this.totalAreas,
+  });
+
+  final TravelerProfile profile;
+  final List<ProvinceStamp> collection;
+  final int totalAreas;
+
+  @override
+  State<_PassportView> createState() => _PassportViewState();
+}
+
+class _PassportViewState extends State<_PassportView> {
   // Trạng thái bộ lọc hiện tại
   String _selectedFilter = 'Tất cả';
 
@@ -104,7 +165,10 @@ class _PassportScreenState extends State<PassportScreen> {
               CircleAvatar(
                 radius: 32,
                 backgroundColor: AppTheme.secondaryColor,
-                backgroundImage: NetworkImage(widget.profile.avatarUrl),
+                backgroundImage: widget.profile.avatarUrl.isEmpty
+                    ? null
+                    : NetworkImage(widget.profile.avatarUrl),
+                child: widget.profile.avatarUrl.isEmpty ? const Icon(Icons.person) : null,
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -147,8 +211,8 @@ class _PassportScreenState extends State<PassportScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _cardInfo('Passport Issurance Date',
-                  '${widget.profile.issueDate.day}/${widget.profile.issueDate.month}/${widget.profile.issueDate.year}'),
+              if (widget.profile.issueDate case final date?)
+                _cardInfo('Passport issue date', '${date.day}/${date.month}/${date.year}'),
               _cardInfo('Visited', '${widget.profile.visitedCount} location(s)'),
             ],
           ),
@@ -271,7 +335,7 @@ class _PassportScreenState extends State<PassportScreen> {
   }
 
   Widget _buildCollectionBookHeader(BuildContext context) {
-    final unlockedCount = sampleCollectionBook.length;
+    final unlockedCount = widget.collection.length;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
       child: Row(
@@ -296,10 +360,10 @@ class _PassportScreenState extends State<PassportScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '$unlockedCount / $totalVietnamProvinces',
+                '$unlockedCount / ${widget.totalAreas}',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
-              Text('Provinces', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+              Text('Khu vực', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
             ],
           ),
         ],
@@ -308,8 +372,8 @@ class _PassportScreenState extends State<PassportScreen> {
   }
 
   Widget _buildCollectionBookGrid(BuildContext context) {
-    const lockedPreviewCount = 1;
-    final itemCount = sampleCollectionBook.length + lockedPreviewCount;
+    final lockedPreviewCount = widget.collection.length < widget.totalAreas ? 1 : 0;
+    final itemCount = widget.collection.length + lockedPreviewCount;
 
     return SliverPadding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
@@ -322,8 +386,8 @@ class _PassportScreenState extends State<PassportScreen> {
         ),
         delegate: SliverChildBuilderDelegate(
               (context, index) {
-            if (index < sampleCollectionBook.length) {
-              return ProvinceBadgeCard(province: sampleCollectionBook[index]);
+            if (index < widget.collection.length) {
+              return ProvinceBadgeCard(province: widget.collection[index]);
             }
             return const ProvinceBadgeCard();
           },
