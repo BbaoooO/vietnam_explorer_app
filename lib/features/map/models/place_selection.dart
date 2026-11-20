@@ -1,4 +1,4 @@
-import '../data/tourism_places.dart';
+import '../../../core/models/tourism_place.dart';
 
 class RouteLocation {
   const RouteLocation({required this.place});

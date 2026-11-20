@@ -1,5 +1,11 @@
 import 'package:android_project/core/app_nav.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../core/models/destination.dart';
+import '../../core/models/tourism_place.dart';
+import '../../core/models/travel_records.dart';
+import '../../core/providers/travel_data.dart';
 //nạp lớp điều bộ appNav & thư viện giao diện Material
 
 class HomeDiscoverScreen extends StatefulWidget
@@ -34,309 +40,15 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
   String _query = ''; //ban đầu chưa nhập từ khóa
   String _selectedRegion = 'All'; //chưa giới hạn khu vực
   int _heroIndex = 0; //ảnh đầu tiên có chỉ số bằng 0
-  final Set<String> _favorites = <String>{};
-  //tạo tập hợp mã địa điểm yêu thích rỗng
-  //final vẫn thêm xóa sửa được , final ngăn gán _favorites sang tập hợp khác, nhưng không ngăn thay đổi của tập hợp hiện tại
+  Set<String> get _favorites => context.read<TravelData>().favorites
+      .where((target) => target.kind == CatalogKind.destination)
+      .map((target) => target.id)
+      .toSet();
+
   final List<String> _regions = const <String>['All', 'North', 'Central', 'South'];
   //danh sách nhãn dùng để tạo các nút lọc. Danh sách const khong the thêm,sua,xóa phần tử
 
-  final List<_Destination> _destinations = const <_Destination>
-  //khai báo dữ liệu địa điểm và trải nghiệm
-  [
-    // ======================= NORTH =======================
-    _Destination(
-      id: 'hanoi',
-      title: 'Hanoi',
-      subtitle: 'Culture & old streets', //đặc điểm nổi bật trình bày ngắn
-      region: 'North', //khu vực dùng để lọc
-      image: 'assets/images/hanoi.jpg',
-      rating: 4.9,
-      description:
-      'Walk around Hoan Kiem Lake, eat bun cha in the Old Quarter and watch the city wake up over a cup of egg coffee.',
-      bestTime: 'Sep - Nov',
-      duration: '3 days', //thời lượng chuyến đi gợi ý
-      budget: '800k/day',
-    ),
-    _Destination(
-      id: 'sapa',
-      title: 'Sapa',
-      subtitle: 'Mountains & terraces',
-      region: 'North',
-      image: 'assets/images/sapa.jpg',
-      rating: 4.8,
-      description:
-      'Trek between rice terraces, sleep in a village homestay and wake up above the clouds.',
-      bestTime: 'Mar - May',
-      duration: '3 days',
-      budget: '700k/day',
-    ),
-    _Destination(
-      id: 'halong',
-      title: 'Ha Long Bay',
-      subtitle: 'Cruise & limestone islands',
-      region: 'North',
-      image: 'assets/images/halong.jpg',
-      rating: 4.9,
-      description:
-      'Thousands of limestone islands rise out of emerald water. Kayak through caves and spend a night on a cruise.',
-      bestTime: 'Oct - Apr',
-      duration: '2 days',
-      budget: '1.5M/day',
-    ),
-    _Destination(
-      id: 'ninhbinh',
-      title: 'Ninh Binh',
-      subtitle: 'Karst rivers & ancient capital',
-      region: 'North',
-      image: 'assets/images/ninhbinh.jpg',
-      rating: 4.9,
-      description:
-      'Row a boat through Trang An caves, climb Hang Mua for the view and visit Hoa Lu, the capital of Vietnam a thousand years ago.',
-      bestTime: 'Jan - May',
-      duration: '2 days',
-      budget: '650k/day',
-    ),
-    _Destination(
-      id: 'hagiang',
-      title: 'Ha Giang',
-      subtitle: 'Mountain loop & Ma Pi Leng',
-      region: 'North',
-      image: 'assets/images/hagiang.jpg',
-      rating: 4.9,
-      description:
-      'The far north loop: winding passes, stone villages and the Ma Pi Leng pass above the Nho Que river. Best done on a motorbike with a local guide.',
-      bestTime: 'Sep - Nov',
-      duration: '4 days',
-      budget: '700k/day',
-    ),
-    _Destination(
-      id: 'laocai',
-      title: 'Lao Cai',
-      subtitle: 'Fansipan & Bac Ha market',
-      region: 'North',
-      image: 'assets/images/laocai.jpg',
-      rating: 4.8,
-      description:
-      'Take the cable car up Fansipan, the highest peak in Indochina, then visit the colorful Bac Ha Sunday market and the terraced valleys of Y Ty.',
-      bestTime: 'Sep - Nov',
-      duration: '3 days',
-      budget: '700k/day',
-    ),
-
-    // ======================= CENTRAL =======================
-    _Destination(
-      id: 'hue',
-      title: 'Hue',
-      subtitle: 'Imperial city & royal tombs',
-      region: 'Central',
-      image: 'assets/images/hue.jpg',
-      rating: 4.8,
-      description:
-      'The old capital of the Nguyen emperors. Explore the Citadel, the royal tombs along the Perfume River and the local royal cuisine.',
-      bestTime: 'Jan - Apr',
-      duration: '2 days',
-      budget: '700k/day',
-    ),
-    _Destination(
-      id: 'danang',
-      title: 'Da Nang',
-      subtitle: 'Beach & city',
-      region: 'Central',
-      image: 'assets/images/danang.jpg',
-      rating: 4.8,
-      description:
-      'A clean beach city with the Dragon Bridge, Marble Mountains and the Ba Na Hills a short ride away.',
-      bestTime: 'Feb - May',
-      duration: '3 days',
-      budget: '900k/day',
-    ),
-    _Destination(
-      id: 'hoian',
-      title: 'Hoi An',
-      subtitle: 'Lanterns & heritage',
-      region: 'Central',
-      image: 'assets/images/hoian.jpg',
-      rating: 4.9,
-      description:
-      'A lantern-lit ancient town. Get a tailored outfit, cycle through paddy fields and float a candle on the river.',
-      bestTime: 'Feb - Apr',
-      duration: '2 days',
-      budget: '850k/day',
-    ),
-    _Destination(
-      id: 'quynhon',
-      title: 'Quy Nhon',
-      subtitle: 'Quiet beaches & seafood',
-      region: 'Central',
-      image: 'assets/images/quynhon.jpg',
-      rating: 4.7,
-      description:
-      'A calmer coastal city with clear beaches, Cham towers and very fresh seafood. Ky Co and Eo Gio are the places to go.',
-      bestTime: 'Feb - Aug',
-      duration: '3 days',
-      budget: '750k/day',
-    ),
-    _Destination(
-      id: 'nhatrang',
-      title: 'Nha Trang',
-      subtitle: 'Sea & island escape',
-      region: 'Central', // trước đây: South
-      image: 'assets/images/nhatrang.jpg',
-      rating: 4.7,
-      description:
-      'Island hopping, snorkeling and mud baths along a long curved bay.',
-      bestTime: 'Jan - Aug',
-      duration: '3 days',
-      budget: '1M/day',
-    ),
-    _Destination(
-      id: 'dalat',
-      title: 'Da Lat',
-      subtitle: 'Pine hills & cool cafes',
-      region: 'Central',
-      image: 'assets/images/dalat.jpg',
-      rating: 4.8,
-      description:
-      'A cool highland town of pine forests, flower farms and hillside cafes. Ride to the waterfalls or just wander the lake at dusk.',
-      bestTime: 'Dec - Mar',
-      duration: '3 days',
-      budget: '750k/day',
-    ),
-    _Destination(
-      id: 'muine',
-      title: 'Mui Ne',
-      subtitle: 'Red dunes & kitesurfing',
-      region: 'Central', // trước đây: South
-      image: 'assets/images/muine.jpg',
-      rating: 4.6,
-      description:
-      'Watch sunrise on the white and red sand dunes, walk the Fairy Stream and try kitesurfing when the wind picks up.',
-      bestTime: 'Dec - Apr',
-      duration: '2 days',
-      budget: '800k/day',
-    ),
-
-    // ======================= SOUTH =======================
-    _Destination(
-      id: 'hochiminh',
-      title: 'Ho Chi Minh City',
-      subtitle: 'Street food & city life',
-      region: 'South',
-      image: 'assets/images/hochiminh.jpg',
-      rating: 4.7,
-      description:
-      'Vietnam\'s busiest city. Eat your way through Ben Thanh and District 1, visit the War Remnants Museum and finish on a rooftop bar.',
-      bestTime: 'Dec - Apr',
-      duration: '3 days',
-      budget: '1M/day',
-    ),
-    _Destination(
-      id: 'condao',
-      title: 'Con Dao',
-      subtitle: 'Island history & turtle beaches',
-      region: 'South',
-      image: 'assets/images/condao.jpg',
-      rating: 4.8,
-      description:
-      'A quiet island group with historic prisons, empty beaches and good diving. Turtles nest here in the warmer months.',
-      bestTime: 'Mar - Sep',
-      duration: '3 days',
-      budget: '1.3M/day',
-    ),
-    _Destination(
-      id: 'phuquoc',
-      title: 'Phu Quoc',
-      subtitle: 'Tropical island',
-      region: 'South',
-      image: 'assets/images/phuquoc.jpg',
-      rating: 4.8,
-      description:
-      'White sand, clear water and night markets. The easiest place in Vietnam to do nothing well.',
-      bestTime: 'Nov - Apr',
-      duration: '4 days',
-      budget: '1.4M/day',
-    ),
-    _Destination(
-      id: 'cantho',
-      title: 'Can Tho',
-      subtitle: 'River & floating market',
-      region: 'South', // trước đây: Mekong
-      image: 'assets/images/cantho.jpg',
-      rating: 4.7,
-      description:
-      'Board a boat at dawn for the Cai Rang floating market, then eat fruit straight from the orchard.',
-      bestTime: 'Aug - Dec',
-      duration: '2 days',
-      budget: '600k/day',
-    ),
-    _Destination(
-      id: 'bentre',
-      title: 'Ben Tre',
-      subtitle: 'Coconut groves & canals',
-      region: 'South', // trước đây: Mekong
-      image: 'assets/images/bentre.jpg',
-      rating: 4.7,
-      description:
-      'The coconut capital of Vietnam. Paddle a small boat through narrow canals, watch candy being made from coconut and stay in a riverside homestay.',
-      bestTime: 'Dec - Apr',
-      duration: '2 days',
-      budget: '600k/day',
-    ),
-    _Destination(
-      id: 'chaudoc',
-      title: 'Chau Doc',
-      subtitle: 'Floating villages & Sam Mountain',
-      region: 'South', // trước đây: Mekong
-      image: 'assets/images/chaudoc.jpg',
-      rating: 4.7,
-      description:
-      'A border town on the Bassac River. Visit the floating fish farms, the Cham village and climb Sam Mountain for a view over the paddy fields.',
-      bestTime: 'Sep - Nov',
-      duration: '2 days',
-      budget: '600k/day',
-    ),
-    _Destination(
-      id: 'camau',
-      title: 'Ca Mau',
-      subtitle: 'Mangroves & the southern tip',
-      region: 'South', // trước đây: Mekong
-      image: 'assets/images/camau.jpg',
-      rating: 4.6,
-      description:
-      'Take a boat through the U Minh mangrove forest and travel to Mui Ca Mau, the southernmost point of mainland Vietnam.',
-      bestTime: 'Dec - Apr',
-      duration: '2 days',
-      budget: '550k/day',
-    ),
-    _Destination(
-      id: 'vinhlong',
-      title: 'Vinh Long',
-      subtitle: 'Orchards & village life',
-      region: 'South', // trước đây: Mekong
-      image: 'assets/images/vinhlong.jpg',
-      rating: 4.6,
-      description:
-      'Cycle between fruit orchards, visit old riverside houses and see how pottery and bricks are made in the traditional kilns.',
-      bestTime: 'May - Aug',
-      duration: '2 days',
-      budget: '550k/day',
-    ),
-    _Destination(
-      id: 'dongthap',
-      title: 'Dong Thap',
-      subtitle: 'Lotus fields & Sa Dec flowers',
-      region: 'South', // trước đây: Mekong
-      image: 'assets/images/dongthap.jpg',
-      rating: 4.7,
-      description:
-      'Famous for its pink lotus ponds, the Sa Dec flower village and Tram Chim National Park, where cranes visit in the dry season.',
-      bestTime: 'Jun - Aug',
-      duration: '2 days',
-      budget: '550k/day',
-      //budget hiện chỉ là chuỗi, nên không trực tiếp cộng với ngân sách khác
-    ),
-  ];
-
+  List<Destination> get _destinations => context.read<TravelData>().destinations;
 
   final List<_Experience> _experiences = const <_Experience>[
     _Experience(
@@ -363,7 +75,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
 
   static const List<String> _featuredIds = <String>['halong', 'hoian', 'sapa'];
 
-  List<_Destination> get _featured =>
+  List<Destination> get _featured =>
   //get__featured getter trả về danh sách địa điểm nổi bật
       _featuredIds.map((id) => _destinations.firstWhere((d) => d.id == id)).toList();
 //_featuredIds.map duyệt tùng mã và biến mã thành một đối tượng địa điểm
@@ -371,7 +83,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
   //toList: chuyền kết quả thành list
   //nếu mã không tồn tại, fistWhere() sẽ báo lỗi vì chưa có orElse. Cần đảm bảo các mã nổi bật
   //hợp lệ hoặc bổ sung xử lý trường hợp thiếu
-  List<_Destination> get _filteredDestinations
+  List<Destination> get _filteredDestinations
   //getter tao danh sách phù hợp với lựa chọn hiện tại
   {
     final q = _query.trim().toLowerCase();
@@ -389,7 +101,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
     }).toList();//chuyển kết quả lọc thành danh sách
   }
   //danh sách yêu thích
-  List<_Destination> get _savedDestinations =>
+  List<Destination> get _savedDestinations =>
       _destinations.where((d) => _favorites.contains(d.id)).toList();
   // duyệt dữ liệu điểm đến, kiểm tra mã có trong _favorites không=> trả về địa điểm đã chọn
   //thứ tự kết quả theo _destinations, không theo tgian người dùng nhấn lưu
@@ -402,18 +114,24 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
     super.dispose(); //gọi xử lý của lớp cha
   }
 
-  void _toggleFavorite(String id)
-  //_toggleFavorite(..) hàm nhận mã địa điểm, không trả về giá trị
-  {
-    setState(() // thay đổi trạng thái và yêu cầu flutter cập nhật giao diên
-    {
-      if (!_favorites.remove(id)) _favorites.add(id);
-      //favorite_remove(id) thử xóa mã trả về true nếu mã đã tồn tại và được xóa
-      //favorite_add(id) nếu chưa có mã để xóa thì thêm mã vào
-    });
+  Future<void> _toggleFavorite(String id) => _toggleSaved(destinationRef(id));
+
+  Future<void> _toggleSaved(CatalogRef target, {bool? saved}) async {
+    try {
+      final data = context.read<TravelData>();
+      if (saved == null) {
+        await data.toggleFavorite(target);
+      } else {
+        await data.setFavorite(target, saved);
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Chưa cập nhật được địa điểm đã lưu.')),
+      );
+    }
   }
 
-//xóa bộ lộc và giải phóng controler
   void _resetFilters() {
     setState(() {
       _query = ''; //xóa từ khóa dùng trong logic
@@ -422,8 +140,11 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
     });
   }
   // Bảng chi tiết địa điểm
-  void _openDestination(_Destination item) //nhận đối tượng địa điểm người dùng chọn
+  void _openDestination(Destination item) //nhận đối tượng địa điểm người dùng chọn
   {
+    final data = context.read<TravelData>();
+    final navigation = context.read<AppNav>();
+    final places = data.places.where((place) => place.destinationId == item.id).toList();
     showModalBottomSheet(
       context: context, //cho flutter biết vị trí cây widget để mở bảng
       useSafeArea: true, //tránh vùng hệ thống ở phía trên và hai bên bảng
@@ -518,8 +239,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                         onPressed: () //nút open map
                         {
                           Navigator.popUntil(context, (route) => route.isFirst);//đóng các route phia trên đến route đầu tiên của Navigator đang được sd
-                          AppNav.mapFocusId.value = item.id;//gửi mã địa điểm
-                          AppNav.tab.value = AppNav.map; //gửi yêu cầu chuyển tab map
+                          navigation.openMap(destinationRef(item.id));
                           //popUntil có thể đóng cả danh sách và bảng chi tiết nếu 2 bảng đang mở chồng nhau.
                         },
                         icon: const Icon(Icons.map_outlined, size: 19),
@@ -537,9 +257,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                       child: OutlinedButton.icon(
                         onPressed: () {
                           Navigator.popUntil(context, (route) => route.isFirst);
-                          AppNav.plannerAddId.value = item.id; //nút plan trip
-                          AppNav.tab.value = AppNav.planner;
-                          //gửi mã sang Planner & yêu cầu chuyển tab
+                          navigation.openPlanner((title: item.title, target: destinationRef(item.id)));
                         },
                         icon: const Icon(Icons.event_note_rounded, size: 19),
                         label: const Text('Plan trip'),
@@ -553,6 +271,21 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                     ),
                   ],
                 ),
+                if (places.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+                  Text('Địa danh tại ${item.title}', style: Theme.of(context).textTheme.titleMedium),
+                  for (final place in places)
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.place_outlined),
+                      title: Text(place.name),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.popUntil(context, (route) => route.isFirst);
+                        navigation.openMap(placeRef(place.id));
+                      },
+                    ),
+                ],
               ],
             ),
           ),
@@ -618,7 +351,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                 FilledButton(
                   onPressed: () {
                     Navigator.pop(context); //đóng bảng hiện tại
-                    AppNav.tab.value = AppNav.planner;//dòng sau chuyển tab
+                    this.context.read<AppNav>().openPlanner((title: item.title, target: null));
                   },
                   style: FilledButton.styleFrom(
                     backgroundColor: _primary,
@@ -636,80 +369,86 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
     );
   }
 //bảng view all và saved places
-  void _showDestinationsSheet(String title, List<_Destination> list) //1 hàm dùng cho 2 mục đích khác nhau bằng cách truyền tiêu đề và ds khác nhau
-  {
-    showModalBottomSheet(
+  void _showDestinationsSheet(String title, {bool savedOnly = false}) {
+    final data = context.read<TravelData>();
+    final navigation = context.read<AppNav>();
+    showModalBottomSheet<void>(
       context: context,
       useSafeArea: true,
       isScrollControlled: true,
       showDragHandle: true,
       backgroundColor: _background,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (context) {
-        return DraggableScrollableSheet(
-          expand: false, //không tự chiếm toàn bộ vùng bố cục cha
-          initialChildSize: 0.88, //mở đầu 88% chiều cao vùng cha
-          minChildSize: 0.55,
-          maxChildSize: 0.96,
-          builder: (context, scrollController) //cung cấp controller để phối hợp thao tác cuộn bẳng và cuộn ds
-          {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 2, 20, 14),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: const TextStyle(
-                            color: _text,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.4,
-                          ),
-                        ),
+      builder: (sheetContext) => ListenableBuilder(
+        listenable: data,
+        builder: (_, _) {
+          final destinations = savedOnly ? _savedDestinations : data.destinations;
+          final places = savedOnly
+              ? data.places.where((place) => data.favorites.contains(placeRef(place.id))).toList()
+              : const <TourismPlace>[];
+          return DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: .88,
+            minChildSize: .55,
+            maxChildSize: .96,
+            builder: (_, scrollController) => CustomScrollView(
+              controller: scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 2, 20, 14),
+                    child: Text(title, style: Theme.of(sheetContext).textTheme.titleLarge),
+                  ),
+                ),
+                if (destinations.isEmpty && places.isEmpty)
+                  const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(child: Text('Bạn chưa lưu địa điểm nào.')),
+                  ),
+                if (destinations.isNotEmpty)
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                    sliver: SliverGrid.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 14,
+                        crossAxisSpacing: 14,
+                        childAspectRatio: .72,
                       ),
+                      itemCount: destinations.length,
+                      itemBuilder: (_, index) => _destinationCard(destinations[index]),
+                    ),
+                  ),
+                if (places.isNotEmpty)
+                  SliverList.list(
+                    children: [
+                      for (final place in places)
+                        ListTile(
+                          leading: const Icon(Icons.place_outlined),
+                          title: Text(place.name),
+                          subtitle: Text(place.province),
+                          trailing: IconButton(
+                            tooltip: 'Bỏ lưu',
+                            icon: const Icon(Icons.bookmark_remove_outlined),
+                            onPressed: () => _toggleSaved(placeRef(place.id), saved: false),
+                          ),
+                          onTap: () {
+                            Navigator.pop(sheetContext);
+                            navigation.openMap(placeRef(place.id));
+                          },
+                        ),
                     ],
                   ),
-                ),
-                Expanded(
-                  child: list.isEmpty
-                      ? const Center(
-                    child: Text(
-                      'Nothing here yet.\nTap the heart on a destination to save it.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: _muted, height: 1.5),
-                    ),
-                  )
-                      : GridView.builder(
-                    controller: scrollController,//gắn controller của bảng
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                    itemCount: list.length, // xác định số phần tử
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, //2 cột
-                      mainAxisSpacing: 14, //khoảng cách giữa hàng và cột là 14
-                      crossAxisSpacing: 14,
-                      childAspectRatio: 0.72, //tỉ lệ chiều rộng/chiều cao thẻ là 0,72 nên thẻ cao rộng hơn
-                    ),
-                    itemBuilder: (context, index) => _destinationCard(list[index]),
-                    //lấy phần tử ở vị trí index và tạo thẻ tương ứng
-                  ),
-                ),
               ],
-            );
-          },
-        );
-      },
+            ),
+          );
+        },
+      ),
     );
   }
 
-  // ----------------------------------------------------------------- build
-
   @override
   Widget build(BuildContext context) {
+    context.watch<TravelData>();
     final destinations = _filteredDestinations;
     //mỗi lần build, lấy danh sách phù hợp với từ khóa và khu vực hiện tại
 
@@ -729,7 +468,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
               child: _sectionHeader(
                 title: 'Popular destinations',
                 action: 'View all', //nhận danh sách gốc không phải danh sách đã lọc
-                onAction: () => _showDestinationsSheet('All destinations', _destinations),
+                onAction: () => _showDestinationsSheet('All destinations'),
               ),
             ),
             SliverToBoxAdapter(child: _buildRegionFilter()),
@@ -749,6 +488,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
 
   // Header và thanh tìm kiếm
   Widget _buildHeader() {
+    final saved = context.read<TravelData>().favorites;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
       child: Row //header dùng row để xếp ngang
@@ -810,7 +550,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
           ),
           const SizedBox(width: 8),
           InkWell(
-            onTap: () => _showDestinationsSheet('Saved places', _savedDestinations),
+            onTap: () => _showDestinationsSheet('Saved places', savedOnly: true),
             //nút yêu thích : Mở bảng với danh sách đã đánh dấu
             borderRadius: BorderRadius.circular(999),
             child: Container(
@@ -824,16 +564,16 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    _favorites.isEmpty
+                    saved.isEmpty
                         ? Icons.favorite_border_rounded
                         : Icons.favorite_rounded,
                     size: 18,
-                    color: _favorites.isEmpty ? _primary : _stamp,
+                    color: saved.isEmpty ? _primary : _stamp,
                   ),
-                  if (_favorites.isNotEmpty) ...[
+                  if (saved.isNotEmpty) ...[
                     const SizedBox(width: 4),
                     Text(
-                      '${_favorites.length}',
+                      '${saved.length}',
                       style: const TextStyle(
                         color: _text,
                         fontSize: 12.5,
@@ -937,7 +677,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
   }
 
   //Thẻ banner và thẻ địa điểm
-  Widget _heroCard(_Destination item) {
+  Widget _heroCard(Destination item) {
     final saved = _favorites.contains(item.id);//kiểm tra để vẽ trái tim rỗng hoặc đầy
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -1110,7 +850,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
   }
 
   //Danh sách địa điểm
-  Widget _destinationList(List<_Destination> list) {
+  Widget _destinationList(List<Destination> list) {
     return SizedBox(
       height: 262,
       child: ListView.separated(
@@ -1128,7 +868,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
     );
   }
 
-  Widget _destinationCard(_Destination item) {
+  Widget _destinationCard(Destination item) {
     final saved = _favorites.contains(item.id);
 
     return GestureDetector(
@@ -1318,7 +1058,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
       padding: const EdgeInsets.fromLTRB(20, 26, 20, 0),
       child: InkWell(
         borderRadius: BorderRadius.circular(26),
-        onTap: () => AppNav.tab.value = AppNav.passport,
+        onTap: () => context.read<AppNav>().tab.value = AppNav.passport,
         //toàn bộ banner có thể nhấn để gửi yêu cầu chuyển sang passport
         child: Container(
           padding: const EdgeInsets.fromLTRB(20, 18, 16, 18),
@@ -1505,32 +1245,6 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
       },
     );
   }
-}
-
-class _Destination {
-  final String id;
-  final String title;
-  final String subtitle;
-  final String region;
-  final String image;
-  final double rating;
-  final String description;
-  final String bestTime;
-  final String duration;
-  final String budget;
-
-  const _Destination({
-    required this.id,
-    required this.title,
-    required this.subtitle,
-    required this.region,
-    required this.image,
-    required this.rating,
-    required this.description,
-    required this.bestTime,
-    required this.duration,
-    required this.budget,
-  });
 }
 
 class _Experience {

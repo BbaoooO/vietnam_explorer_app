@@ -1,7 +1,11 @@
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+
+import '../../core/app_nav.dart';
 import '../../core/explorer_app_bar.dart';
+import '../../core/models/travel_records.dart';
+import '../../core/providers/travel_data.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -25,28 +29,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _enableDarkMode = false;
   String _selectedCurrency = 'VND (₫)';
   String _selectedLanguage = 'English';
-
-// Sample saved destinations
-  final List _savedDestinations = [
-  {
-  'title': 'Ha Long Bay',
-  'location': 'Quang Ninh, Vietnam',
-  'image':
-  'https://images.unsplash.com/photo-1528127269322-539801943592?w=500',
-  },
-  {
-  'title': 'Hoi An Ancient Town',
-  'location': 'Quang Nam, Vietnam',
-  'image':
-  'https://images.unsplash.com/photo-1555921015-5532091f6026?w=500',
-  },
-  {
-  'title': 'Trang An Landscape',
-  'location': 'Ninh Binh, Vietnam',
-  'image':
-  'https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=500',
-  },
-  ];
 
   @override
   void initState() {
@@ -250,100 +232,82 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // --- 3. SAVED DESTINATIONS SHEET ---
   void _showSavedDestinationsSheet() {
-    showModalBottomSheet(
+    final data = context.read<TravelData>();
+    final navigation = context.read<AppNav>();
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Container(
-              height: MediaQuery.of(context).size.height * 0.65,
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Saved Destinations (${_savedDestinations.length})',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor,
-                          fontFamily: 'Be Vietnam Pro',
+      showDragHandle: true,
+      builder: (sheetContext) => ListenableBuilder(
+        listenable: data,
+        builder: (_, _) => SafeArea(
+          child: SizedBox(
+            height: MediaQuery.sizeOf(sheetContext).height * 0.65,
+            child: Column(
+              children: [
+                Text('Đã lưu (${data.favorites.length})', style: Theme.of(sheetContext).textTheme.titleLarge),
+                if (data.canImportLegacyFavorites)
+                  TextButton.icon(
+                    onPressed: () => _importLegacyFavorites(sheetContext, data),
+                    icon: const Icon(Icons.restore),
+                    label: const Text('Nhập địa điểm đã lưu từ bản cũ'),
+                  ),
+                Expanded(
+                  child: data.favorites.isEmpty
+                      ? const Center(child: Text('Bạn chưa lưu địa điểm nào.'))
+                      : ListView(
+                          children: [
+                            for (final target in data.favorites)
+                              ListTile(
+                                leading: Icon(target.kind == CatalogKind.place
+                                    ? Icons.place_outlined : Icons.map_outlined),
+                                title: Text(data.title(target) ?? target.id),
+                                onTap: () {
+                                  Navigator.pop(sheetContext);
+                                  navigation.openMap(target);
+                                },
+                                trailing: IconButton(
+                                  tooltip: 'Bỏ lưu',
+                                  onPressed: () async {
+                                    try {
+                                      await data.setFavorite(target, false);
+                                    } catch (_) {
+                                      if (mounted) _showMessage('Chưa bỏ lưu được địa điểm.', isError: true);
+                                    }
+                                  },
+                                  icon: const Icon(Icons.bookmark_remove_outlined),
+                                ),
+                              ),
+                          ],
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _savedDestinations.isEmpty
-                      ? const Expanded(
-                    child: Center(
-                      child: Text(
-                        'No saved destinations yet.',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  )
-                      : Expanded(
-                    child: ListView.builder(
-                      itemCount: _savedDestinations.length,
-                      itemBuilder: (context, index) {
-                        final item = _savedDestinations[index];
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: ListTile(
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                item['image']!,
-                                width: 56,
-                                height: 56,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            title: Text(
-                              item['title']!,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: primaryColor,
-                              ),
-                            ),
-                            subtitle: Text(item['location']!),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.favorite,
-                                  color: Colors.redAccent),
-                              onPressed: () {
-                                setModalState(() {
-                                  _savedDestinations.removeAt(index);
-                                });
-                                setState(() {});
-                                _showMessage('Removed from saved list.');
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
+  }
+
+  Future<void> _importLegacyFavorites(BuildContext context, TravelData data) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Nhập địa điểm đã lưu?'),
+        content: const Text('Bản cũ lưu chung trên thiết bị. Chỉ nhập nếu danh sách đó là của bạn. Các địa điểm sẽ được thêm vào tài khoản đang đăng nhập.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Nhập')),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true) return;
+    try {
+      await data.importLegacyFavorites();
+      if (mounted) _showMessage('Đã nhập địa điểm đã lưu.');
+    } catch (_) {
+      if (mounted) _showMessage('Chưa nhập được địa điểm.', isError: true);
+    }
   }
 
   // --- 4. SETTINGS SHEET ---
@@ -486,7 +450,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Padding(
                             padding: EdgeInsets.all(12.0),
                             child: Text(
-                              'Go to the Trip Planner tab and click the "+ Add Plan" button at the bottom right.',
+                              'Tạo chuyến đi trong Trip Planner, rồi chọn Thêm hoạt động.',
                               style: TextStyle(color: Colors.black87),
                             ),
                           ),
@@ -498,7 +462,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Padding(
                             padding: EdgeInsets.all(12.0),
                             child: Text(
-                              'Stamps are automatically unlocked when you visit destinations on the Interactive Map.',
+                              'Mở một địa danh trên bản đồ và chọn Đánh dấu đã đến để thêm dấu vào hộ chiếu.',
                               style: TextStyle(color: Colors.black87),
                             ),
                           ),
@@ -510,7 +474,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Padding(
                             padding: EdgeInsets.all(12.0),
                             child: Text(
-                              'Yes! Your planned itineraries are saved locally so you can view them anytime without internet.',
+                              'Lịch trình và các địa điểm đã lưu được lưu trên thiết bị. Bản đồ và ảnh trực tuyến vẫn có thể cần kết nối mạng.',
                               style: TextStyle(color: Colors.black87),
                             ),
                           ),
@@ -687,6 +651,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildStatsSection() {
+    final data = context.watch<TravelData>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
@@ -694,16 +659,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Expanded(
             child: _buildStatCard(
               icon: Icons.map,
-              value: '12',
-              label: 'Provinces',
+              value: '${data.visitedAreas.length}',
+              label: 'Khu vực',
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: _buildStatCard(
               icon: Icons.verified,
-              value: '45',
-              label: 'Stamps',
+              value: '${data.visits.length}',
+              label: 'Dấu hộ chiếu',
             ),
           ),
         ],
