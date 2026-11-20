@@ -36,11 +36,12 @@ class TravelRepository {
     return _factory.openDatabase(
       file,
       options: OpenDatabaseOptions(
-        version: 2,
+        version: 3,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
         onCreate: _create,
         onUpgrade: (db, from, _) async {
           if (from < 2) await _createBookingSchema(db);
+          if (from < 3) await _addBookingPaymentMethod(db);
         },
       ),
     );
@@ -67,6 +68,7 @@ class TravelRepository {
       await db.execute(statement);
     }
     await _createBookingSchema(db);
+    await _addBookingPaymentMethod(db);
     final batch = db.batch();
     for (final (index, destination) in destinationSeed.indexed) {
       batch.insert('destinations', {
@@ -114,6 +116,12 @@ class TravelRepository {
     }
   }
 
+  Future<void> _addBookingPaymentMethod(Database db) async {
+    for (final statement in bookingPaymentSchema) {
+      await db.execute(statement);
+    }
+  }
+
   Future<List<Map<String, Object?>>> _bookingRows(
     DatabaseExecutor db,
     String uid, {
@@ -130,7 +138,7 @@ class TravelRepository {
     [uid, if (id != null) id],
   );
 
-  Future<ExperienceBooking> bookDemoExperience(
+  Future<ExperienceBooking> bookExperienceAtVenue(
     String uid, {
     required String id,
     required String experienceId,
@@ -150,7 +158,8 @@ class TravelRepository {
       final rows = await _bookingRows(txn, uid, id: id);
       if (rows.isNotEmpty) {
         final existing = ExperienceBooking.fromRow(rows.single);
-        if (existing.experienceId != experienceId ||
+        if (existing.paymentMethod != BookingPaymentMethod.payAtVenue ||
+            existing.experienceId != experienceId ||
             existing.day != day ||
             existing.minute != minute ||
             existing.guests != guests) {
@@ -171,6 +180,7 @@ class TravelRepository {
         'minute': minute,
         'guests': guests,
         'unit_price_vnd': offer.priceVnd,
+        'payment_method': 'pay_at_venue',
         'created_at': DateTime.now().millisecondsSinceEpoch,
       });
       return ExperienceBooking.fromRow(
@@ -209,7 +219,7 @@ class TravelRepository {
         'booking_id': booking.id,
         'place_id': booking.placeId,
         'title': booking.title,
-        'notes': 'Vé thử ${booking.id} · ${booking.guests} khách',
+        'notes': 'Mã vé ${booking.id} · ${booking.guests} khách',
         'day': booking.day,
         'minute': booking.minute,
         'cost_vnd': booking.totalVnd,

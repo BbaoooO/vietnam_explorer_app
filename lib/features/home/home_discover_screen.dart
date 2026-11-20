@@ -367,7 +367,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                       ));
                     },
                     icon: const Icon(Icons.confirmation_number_outlined),
-                    label: const Text('Đặt vé thử'),
+                    label: const Text('Đặt vé'),
                     style: FilledButton.styleFrom(
                       backgroundColor: _primary,
                       minimumSize: const Size.fromHeight(52),

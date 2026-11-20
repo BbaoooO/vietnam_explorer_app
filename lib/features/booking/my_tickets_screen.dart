@@ -103,7 +103,20 @@ class _ExperienceTicketCardState extends State<ExperienceTicketCard> {
             ),
             const SizedBox(height: 6),
             SelectableText('Mã vé ${ticket.id}'),
-            Text('Thanh toán mô phỏng · ${formatTicketVnd(ticket.totalVnd)}'),
+            const SizedBox(height: 8),
+            const Text(
+              'Chưa thanh toán',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            Text('Tổng tiền · ${formatTicketVnd(ticket.totalVnd)}'),
+            if (ticket.paymentMethod == BookingPaymentMethod.payAtVenue) ...[
+              const Text('Phương thức · Thanh toán tại điểm đến'),
+              const Text('Hãy liên hệ đơn vị tổ chức để xác nhận chỗ.'),
+            ] else
+              const Text(
+                'Đơn từ phiên bản trước · Chưa ghi nhận phương thức thanh toán.',
+              ),
+
             const SizedBox(height: 8),
             if (trip != null)
               Text('Trong chuyến đi ${trip.title}')

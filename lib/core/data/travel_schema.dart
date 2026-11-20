@@ -115,3 +115,16 @@ const bookingSchema = <String>[
   'ALTER TABLE trip_items ADD COLUMN booking_id TEXT REFERENCES experience_bookings(id)',
   'CREATE UNIQUE INDEX trip_items_booking ON trip_items(booking_id)',
 ];
+
+const bookingPaymentSchema = <String>[
+  '''
+  ALTER TABLE experience_bookings ADD COLUMN payment_method TEXT
+    NOT NULL DEFAULT 'legacy_local'
+    CHECK (payment_method IN ('legacy_local', 'pay_at_venue'))
+  ''',
+  '''
+  UPDATE trip_items
+  SET notes = 'Mã vé ' || substr(notes, length('Vé thử ') + 1)
+  WHERE booking_id IS NOT NULL AND substr(notes, 1, length('Vé thử ')) = 'Vé thử '
+  ''',
+];
