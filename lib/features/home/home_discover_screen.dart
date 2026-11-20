@@ -9,13 +9,12 @@ import '../../core/models/travel_records.dart';
 import '../../core/providers/travel_data.dart';
 import '../booking/experience_booking_screen.dart';
 import '../../core/services/location_weather_service.dart';
-import '../../core/services/shared_avatar_service.dart';
 //nạp lớp điều bộ appNav & thư viện giao diện Material
 
 class HomeDiscoverScreen extends StatefulWidget
 //Home kế thừa StatefulWidget vì màn hình có trạng thái thay đổi: từ khóa
 //bộ lọc, ảnh hiện tại, yêu thích
-{
+    {
   const HomeDiscoverScreen({super.key});
   //constructor tạo màn hinhf, super.key truyền lên key lớp cha,
   //key hỗ trọ Flutter nhận diện Widget khi cập nhật cây giao diện, constructor const khong có nghĩa trạng thái màn hình không thay đổi
@@ -23,7 +22,7 @@ class HomeDiscoverScreen extends StatefulWidget
   State<HomeDiscoverScreen> createState() => _HomeDiscoverScreenState();//createState() tạo đối tượng giữ trạng thái cho Home
 }
 class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này chứa dữ liệu trạng thái, các hàm xử lý và hàm build()
-{
+    {
   String _currentCity = 'Đang xác định...';
   String _currentTemperature = '--°C';
 
@@ -173,7 +172,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
     for (final entry in names.entries) {
       result = result.replaceAllMapped(
         RegExp(RegExp.escape(entry.key), caseSensitive: false),
-        (_) => entry.value,
+            (_) => entry.value,
       );
     }
     return result;
@@ -226,8 +225,8 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
   static const List<String> _featuredIds = <String>['halong', 'hoian', 'sapa'];
 
   List<Destination> get _featured =>
-  //get__featured getter trả về danh sách địa điểm nổi bật
-      _featuredIds.map((id) => _destinations.firstWhere((d) => d.id == id)).toList();
+      //get__featured getter trả về danh sách địa điểm nổi bật
+  _featuredIds.map((id) => _destinations.firstWhere((d) => d.id == id)).toList();
 //_featuredIds.map duyệt tùng mã và biến mã thành một đối tượng địa điểm
   //firstWhere (....) tìm địa đầu tiên có d.id ==id
   //toList: chuyền kết quả thành list
@@ -669,13 +668,12 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
       child: Row //header dùng row để xếp ngang
         (
         children: [
-          ValueListenableBuilder<String>(
-            valueListenable: SharedAvatarService.avatarUrl,
-            builder: (context, avatar, _) => CircleAvatar(
-              radius: 23,
-              backgroundColor: _primary,
-              backgroundImage: NetworkImage(avatar),
-            ),
+          Container(
+            width: 46,
+            height: 46,
+            decoration: const BoxDecoration(color: _primary, shape: BoxShape.circle),
+            alignment: Alignment.center,
+            child: const Icon(Icons.person_rounded, color: Colors.white, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -769,7 +767,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
       child: TextField //ô nhập dữ liệu
-       (
+        (
         controller: _searchController, //controller liên kết nội dung nhập với controller
         textInputAction: TextInputAction.search,
         //gợi ý nút search trên bàn phím,không tự triển khai thuật toán tìm kiếm
@@ -781,13 +779,13 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
           prefixIcon: const Icon(Icons.search_rounded, color: _primary),
           suffixIcon: _query.isEmpty || _isListening
               ? IconButton(
-                  tooltip: _isListening ? 'Dừng nghe' : 'Tìm bằng giọng nói',
-                  onPressed: _toggleVoiceSearch,
-                  icon: Icon(
-                    _isListening ? Icons.mic_rounded : Icons.mic_none_rounded,
-                    color: _isListening ? Colors.red : _primary,
-                  ),
-                )
+            tooltip: _isListening ? 'Dừng nghe' : 'Tìm bằng giọng nói',
+            onPressed: _toggleVoiceSearch,
+            icon: Icon(
+              _isListening ? Icons.mic_rounded : Icons.mic_none_rounded,
+              color: _isListening ? Colors.red : _primary,
+            ),
+          )
               : IconButton(
             onPressed: () {
               _searchController.clear();

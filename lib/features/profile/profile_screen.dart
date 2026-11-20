@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/app_nav.dart';
-import '../../core/services/shared_avatar_service.dart';
 import '../../core/explorer_app_bar.dart';
 import '../../core/models/travel_records.dart';
 import '../../core/providers/travel_data.dart';
@@ -23,7 +22,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Dynamic user data states
   String _displayName = 'Master Explorer';
-  String _avatarUrl = SharedAvatarService.avatarUrl.value;
+  String _avatarUrl =
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500';
 
   // Settings states
   bool _enableNotifications = true;
@@ -37,8 +37,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (user?.displayName != null && user!.displayName!.isNotEmpty) {
       _displayName = user.displayName!;
     }
-    SharedAvatarService.refreshFromUser();
-    _avatarUrl = SharedAvatarService.avatarUrl.value;
+    if (user?.photoURL != null && user!.photoURL!.isNotEmpty) {
+      _avatarUrl = user.photoURL!;
+    }
   }
 
   void _showMessage(String message, {bool isError = false}) {
@@ -88,15 +89,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: presetAvatars.map((url) {
                   return GestureDetector(
                     onTap: () async {
-                      try {
-                        await SharedAvatarService.updateAvatar(url);
-                        if (!mounted) return;
-                        setState(() => _avatarUrl = url);
-                        if (context.mounted) Navigator.pop(context);
-                        _showMessage('Profile photo updated!');
-                      } catch (e) {
-                        if (mounted) _showMessage('Unable to update profile photo: $e', isError: true);
+                      setState(() => _avatarUrl = url);
+                      final user = FirebaseAuth.instance.currentUser;
+                      if (user != null) {
+                        await user.updatePhotoURL(url);
                       }
+                      if (context.mounted) Navigator.pop(context);
+                      _showMessage('Profile photo updated!');
                     },
                     child: CircleAvatar(
                       radius: 28,
