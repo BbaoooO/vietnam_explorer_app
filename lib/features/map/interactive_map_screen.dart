@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -137,13 +138,41 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
           zoom = detailZoom;
           markers = {};
         });
-        map?.animateCamera(CameraUpdate.newLatLngZoom(center, zoom));
+        _fitDestinationPlaces();
         refreshMarkers();
       case CatalogKind.place:
         final place = _data.place(target.id);
         if (place == null) return;
         showPlace(place);
     }
+  }
+
+  void _fitDestinationPlaces() {
+    final places = filteredPlaces;
+    if (places.length < 2) {
+      final focus = places.isEmpty ? center : places.single.position;
+      map?.animateCamera(CameraUpdate.newLatLngZoom(focus, detailZoom));
+      return;
+    }
+    var south = places.first.position.latitude;
+    var north = south;
+    var west = places.first.position.longitude;
+    var east = west;
+    for (final place in places.skip(1)) {
+      south = math.min(south, place.position.latitude);
+      north = math.max(north, place.position.latitude);
+      west = math.min(west, place.position.longitude);
+      east = math.max(east, place.position.longitude);
+    }
+    map?.animateCamera(
+      CameraUpdate.newLatLngBounds(
+        LatLngBounds(
+          southwest: LatLng(south - .001, west - .001),
+          northeast: LatLng(north + .001, east + .001),
+        ),
+        32,
+      ),
+    );
   }
 
   bool _inScope(TourismPlace place) =>

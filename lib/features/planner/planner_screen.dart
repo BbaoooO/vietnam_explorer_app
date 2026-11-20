@@ -11,6 +11,13 @@ import '../../core/providers/travel_data.dart';
 
 String _dayKey(DateTime day) => day.toIso8601String().substring(0, 10);
 
+typedef _TripDetails = ({
+  String title,
+  String start,
+  String end,
+  Set<String> ticketsToDetach,
+});
+
 class PlannerScreen extends StatefulWidget {
   const PlannerScreen({super.key});
 
@@ -45,7 +52,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
 
   Future<void> _createTrip() async {
     final data = context.read<TravelData>();
-    final result = await showDialog<({String title, String start, String end})>(
+    final result = await showDialog<_TripDetails>(
       context: context,
       builder: (_) => const _TripDialog(),
     );
@@ -53,6 +60,32 @@ class _PlannerScreenState extends State<PlannerScreen> {
     await _write(() async {
       final id = await data.addTrip(result.title, result.start, result.end);
       if (mounted) setState(() => _tripId = id);
+    });
+  }
+
+  Future<void> _editTrip(Trip trip) async {
+    final data = context.read<TravelData>();
+    final result = await showDialog<_TripDetails>(
+      context: context,
+      builder: (_) => _TripDialog(
+        trip: trip,
+        activities: data.activities
+            .where((item) => item.tripId == trip.id)
+            .toList(),
+      ),
+    );
+    if (!mounted || result == null) return;
+    await _write(() async {
+      await data.updateTrip(
+        trip.id,
+        title: result.title,
+        start: result.start,
+        end: result.end,
+        ticketsToDetach: result.ticketsToDetach,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Trip updated.')));
     });
   }
 
@@ -193,6 +226,11 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     ),
                   ),
                   IconButton(
+                    tooltip: 'Edit trip',
+                    onPressed: _busy ? null : () => _editTrip(trip),
+                    icon: const Icon(Icons.edit_outlined),
+                  ),
+                  IconButton(
                     tooltip: 'Delete trip',
                     onPressed: _busy ? null : () => _deleteTrip(trip),
                     icon: const Icon(Icons.delete_outline),
@@ -296,17 +334,25 @@ class _PlannerScreenState extends State<PlannerScreen> {
 }
 
 class _TripDialog extends StatefulWidget {
-  const _TripDialog();
+  const _TripDialog({this.trip, this.activities = const []});
+
+  final Trip? trip;
+  final List<TripActivity> activities;
 
   @override
   State<_TripDialog> createState() => _TripDialogState();
 }
 
 class _TripDialogState extends State<_TripDialog> {
-  final _title = TextEditingController();
+  late final _title = TextEditingController(text: widget.trip?.title);
   final _form = GlobalKey<FormState>();
-  DateTime _start = DateUtils.dateOnly(DateTime.now());
-  DateTime _end = DateUtils.dateOnly(DateTime.now());
+  late DateTime _start = widget.trip == null
+      ? DateUtils.dateOnly(DateTime.now())
+      : DateTime.parse(widget.trip!.startDay);
+  late DateTime _end = widget.trip == null
+      ? _start
+      : DateTime.parse(widget.trip!.endDay);
+  bool _reviewing = false;
 
   @override
   void dispose() {
@@ -332,9 +378,79 @@ class _TripDialogState extends State<_TripDialog> {
     });
   }
 
+  Future<void> _submit() async {
+    if (_reviewing || !_form.currentState!.validate()) return;
+    final start = _dayKey(_start);
+    final end = _dayKey(_end);
+    final outside = widget.activities
+        .where(
+          (item) =>
+              item.day.compareTo(start) < 0 || item.day.compareTo(end) > 0,
+        )
+        .toList();
+    final activities = outside.where((item) => item.bookingId == null).toList();
+    final tickets = outside.where((item) => item.bookingId != null).toList();
+    if (outside.isNotEmpty) {
+      setState(() => _reviewing = true);
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            activities.isEmpty
+                ? 'Review affected tickets'
+                : 'Move activities first',
+          ),
+          scrollable: true,
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (activities.isNotEmpty) ...[
+                const Text(
+                  'Move these activities into the new date range before saving.',
+                ),
+                for (final item in activities)
+                  Text('• ${item.title} · ${item.day}'),
+              ],
+              if (tickets.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                const Text(
+                  'These tickets fall outside the new dates. Saving removes them from this trip. They will remain in My Tickets.',
+                ),
+                for (final item in tickets)
+                  Text('• ${item.title} · ${item.day}\n  ${item.bookingId}'),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Back'),
+            ),
+            if (activities.isEmpty)
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Save and unlink'),
+              ),
+          ],
+        ),
+      );
+      if (!mounted) return;
+      setState(() => _reviewing = false);
+      if (confirmed != true) return;
+    }
+    Navigator.pop(context, (
+      title: _title.text.trim(),
+      start: start,
+      end: end,
+      ticketsToDetach: {for (final ticket in tickets) ticket.bookingId!},
+    ));
+  }
+
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Create trip'),
+    title: Text(widget.trip == null ? 'Create trip' : 'Edit trip'),
+    scrollable: true,
     content: Form(
       key: _form,
       child: Column(
@@ -365,15 +481,8 @@ class _TripDialogState extends State<_TripDialog> {
         child: const Text('Cancel'),
       ),
       FilledButton(
-        onPressed: () {
-          if (!_form.currentState!.validate()) return;
-          Navigator.pop(context, (
-            title: _title.text.trim(),
-            start: _dayKey(_start),
-            end: _dayKey(_end),
-          ));
-        },
-        child: const Text('Create'),
+        onPressed: _reviewing ? null : _submit,
+        child: Text(widget.trip == null ? 'Create' : 'Save changes'),
       ),
     ],
   );

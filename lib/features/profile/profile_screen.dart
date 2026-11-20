@@ -381,10 +381,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                     ),
                   ),
-                  const ListTile(
-                    title: Text('Language'),
-                    trailing: Text('English'),
-                  ),
                 ],
               ),
             );

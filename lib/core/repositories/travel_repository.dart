@@ -36,7 +36,7 @@ class TravelRepository {
     return _factory.openDatabase(
       file,
       options: OpenDatabaseOptions(
-        version: 5,
+        version: 6,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
         onCreate: _create,
         onUpgrade: (db, from, _) async {
@@ -44,6 +44,7 @@ class TravelRepository {
           if (from < 3) await _addBookingPaymentMethod(db);
           if (from < 4) await _addCheckoutConfirmation(db);
           if (from < 5) await _migrateEnglishContent(db);
+          if (from < 6) await _addMissingPlaces(db);
         },
       ),
     );
@@ -90,6 +91,11 @@ class TravelRepository {
         'longitude': destination.center.longitude,
       });
     }
+    _seedPlaces(batch);
+    await batch.commit(noResult: true);
+  }
+
+  void _seedPlaces(Batch batch, {ConflictAlgorithm? conflictAlgorithm}) {
     for (final (index, place) in placeSeed.indexed) {
       batch.insert('places', {
         'id': place.id,
@@ -108,8 +114,13 @@ class TravelRepository {
         'image_license_url': place.imageLicenseUrl,
         'source_url': place.sourceUrl,
         'coordinate_note': place.coordinateNote,
-      });
+      }, conflictAlgorithm: conflictAlgorithm);
     }
+  }
+
+  Future<void> _addMissingPlaces(Database db) async {
+    final batch = db.batch();
+    _seedPlaces(batch, conflictAlgorithm: ConflictAlgorithm.ignore);
     await batch.commit(noResult: true);
   }
 
@@ -444,6 +455,69 @@ class TravelRepository {
     'start_day': start,
     'end_day': end,
   });
+
+  Future<void> updateTrip(
+    String uid,
+    int tripId, {
+    required String title,
+    required String start,
+    required String end,
+    required Set<String> ticketsToDetach,
+  }) async {
+    bool isValidDay(String value) {
+      final parsed = DateTime.tryParse(value);
+      return RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value) &&
+          parsed != null &&
+          experienceDay(parsed) == value;
+    }
+
+    if (title.trim().isEmpty ||
+        !isValidDay(start) ||
+        !isValidDay(end) ||
+        start.compareTo(end) > 0) {
+      throw ArgumentError('Invalid trip name or dates.');
+    }
+    final db = await _database;
+    await db.transaction((txn) async {
+      const tripFilter = 'user_id = ? AND trip_id = ?';
+      const outsideDates = '$tripFilter AND (day < ? OR day > ?)';
+      final outsideArgs = [uid, tripId, start, end];
+      final outside = await txn.query(
+        'trip_items',
+        columns: ['booking_id'],
+        where: outsideDates,
+        whereArgs: outsideArgs,
+      );
+      final actualTickets = <String>{};
+      for (final item in outside) {
+        final ticketId = item['booking_id'] as String?;
+        if (ticketId == null) {
+          throw StateError('Move activities outside the new trip dates first.');
+        }
+        actualTickets.add(ticketId);
+      }
+      if (ticketsToDetach.length != actualTickets.length ||
+          !ticketsToDetach.containsAll(actualTickets)) {
+        throw StateError('Review the affected tickets again.');
+      }
+      final updated = await txn.update(
+        'trips',
+        {'title': title.trim(), 'start_day': start, 'end_day': end},
+        where: 'user_id = ? AND id = ?',
+        whereArgs: [uid, tripId],
+      );
+      if (updated != 1)
+        throw StateError('Trip does not exist for this account.');
+      if (actualTickets.isNotEmpty) {
+        // A ticket is a separate record and remains in My Tickets.
+        await txn.delete(
+          'trip_items',
+          where: '$outsideDates AND booking_id IS NOT NULL',
+          whereArgs: outsideArgs,
+        );
+      }
+    });
+  }
 
   Future<void> deleteTrip(String uid, int id) async {
     await (await _database).delete(

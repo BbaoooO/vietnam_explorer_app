@@ -94,6 +94,23 @@ class TravelData extends ChangeNotifier {
   Future<int> addTrip(String title, String start, String end) =>
       _mutate(() => _repository.addTrip(uid, title, start, end));
 
+  Future<void> updateTrip(
+    int id, {
+    required String title,
+    required String start,
+    required String end,
+    required Set<String> ticketsToDetach,
+  }) => _mutate(
+    () => _repository.updateTrip(
+      uid,
+      id,
+      title: title,
+      start: start,
+      end: end,
+      ticketsToDetach: ticketsToDetach,
+    ),
+  );
+
   Future<void> deleteTrip(int id) =>
       _mutate(() => _repository.deleteTrip(uid, id));
 
