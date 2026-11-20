@@ -1,4 +1,5 @@
 import '../../core/explorer_app_bar.dart';
+import '../../core/services/shared_avatar_service.dart';
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import 'data/collection_book_data.dart';
@@ -101,10 +102,13 @@ class _PassportScreenState extends State<PassportScreen> {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 32,
-                backgroundColor: AppTheme.secondaryColor,
-                backgroundImage: NetworkImage(widget.profile.avatarUrl),
+              ValueListenableBuilder<String>(
+                valueListenable: SharedAvatarService.avatarUrl,
+                builder: (context, avatar, _) => CircleAvatar(
+                  radius: 32,
+                  backgroundColor: AppTheme.secondaryColor,
+                  backgroundImage: NetworkImage(avatar),
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
