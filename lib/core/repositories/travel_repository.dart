@@ -36,11 +36,13 @@ class TravelRepository {
     return _factory.openDatabase(
       file,
       options: OpenDatabaseOptions(
-        version: 2,
+        version: 4,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
         onCreate: _create,
         onUpgrade: (db, from, _) async {
           if (from < 2) await _createBookingSchema(db);
+          if (from < 3) await _addBookingPaymentMethod(db);
+          if (from < 4) await _addCheckoutConfirmation(db);
         },
       ),
     );
@@ -67,6 +69,8 @@ class TravelRepository {
       await db.execute(statement);
     }
     await _createBookingSchema(db);
+    await _addBookingPaymentMethod(db);
+    await _addCheckoutConfirmation(db);
     final batch = db.batch();
     for (final (index, destination) in destinationSeed.indexed) {
       batch.insert('destinations', {
@@ -114,6 +118,18 @@ class TravelRepository {
     }
   }
 
+  Future<void> _addBookingPaymentMethod(Database db) async {
+    for (final statement in bookingPaymentSchema) {
+      await db.execute(statement);
+    }
+  }
+
+  Future<void> _addCheckoutConfirmation(Database db) async {
+    for (final statement in bookingCheckoutSchema) {
+      await db.execute(statement);
+    }
+  }
+
   Future<List<Map<String, Object?>>> _bookingRows(
     DatabaseExecutor db,
     String uid, {
@@ -130,7 +146,7 @@ class TravelRepository {
     [uid, if (id != null) id],
   );
 
-  Future<ExperienceBooking> bookDemoExperience(
+  Future<ExperienceBooking> confirmExperienceCheckout(
     String uid, {
     required String id,
     required String experienceId,
@@ -150,7 +166,8 @@ class TravelRepository {
       final rows = await _bookingRows(txn, uid, id: id);
       if (rows.isNotEmpty) {
         final existing = ExperienceBooking.fromRow(rows.single);
-        if (existing.experienceId != experienceId ||
+        if (!existing.checkoutConfirmed ||
+            existing.experienceId != experienceId ||
             existing.day != day ||
             existing.minute != minute ||
             existing.guests != guests) {
@@ -171,6 +188,7 @@ class TravelRepository {
         'minute': minute,
         'guests': guests,
         'unit_price_vnd': offer.priceVnd,
+        'checkout_confirmed': 1,
         'created_at': DateTime.now().millisecondsSinceEpoch,
       });
       return ExperienceBooking.fromRow(
@@ -209,7 +227,7 @@ class TravelRepository {
         'booking_id': booking.id,
         'place_id': booking.placeId,
         'title': booking.title,
-        'notes': 'Vé thử ${booking.id} · ${booking.guests} khách',
+        'notes': 'Mã vé ${booking.id} · ${booking.guests} khách',
         'day': booking.day,
         'minute': booking.minute,
         'cost_vnd': booking.totalVnd,

@@ -43,6 +43,7 @@ class ExperienceBooking {
     required this.guests,
     required this.unitPriceVnd,
     required this.tripId,
+    required this.checkoutConfirmed,
   });
 
   final String id;
@@ -54,6 +55,7 @@ class ExperienceBooking {
   final int guests;
   final int unitPriceVnd;
   final int? tripId;
+  final bool checkoutConfirmed;
 
   int get totalVnd => guests * unitPriceVnd;
 
@@ -71,6 +73,7 @@ class ExperienceBooking {
         guests: row['guests'] as int,
         unitPriceVnd: row['unit_price_vnd'] as int,
         tripId: row['trip_id'] as int?,
+        checkoutConfirmed: row['checkout_confirmed'] == 1,
       );
 }
 

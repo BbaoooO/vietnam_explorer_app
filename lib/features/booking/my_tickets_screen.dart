@@ -103,7 +103,12 @@ class _ExperienceTicketCardState extends State<ExperienceTicketCard> {
             ),
             const SizedBox(height: 6),
             SelectableText('Mã vé ${ticket.id}'),
-            Text('Thanh toán mô phỏng · ${formatTicketVnd(ticket.totalVnd)}'),
+            const SizedBox(height: 8),
+            Text(
+              ticket.checkoutConfirmed ? 'Đã đặt vé' : 'Đã lưu đơn',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            Text('Tổng tiền · ${formatTicketVnd(ticket.totalVnd)}'),
             const SizedBox(height: 8),
             if (trip != null)
               Text('Trong chuyến đi ${trip.title}')
