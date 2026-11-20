@@ -259,7 +259,9 @@ class _PlannerScreenState extends State<PlannerScreen> {
         subtitle: Text(
           [
             time.format(context),
-            if (item.costVnd != null) '${item.costVnd} VND',
+            if (item.costVnd != null && item.bookingId == null)
+              '${item.costVnd} VND',
+            if (item.bookingId != null) 'Chi phí thử ${item.costVnd} VND',
             if (item.notes.isNotEmpty) item.notes,
           ].join(' · '),
         ),
@@ -276,10 +278,18 @@ class _PlannerScreenState extends State<PlannerScreen> {
             }
           },
           itemBuilder: (_) => [
-            const PopupMenuItem(value: 'edit', child: Text('Chỉnh sửa')),
+            if (item.bookingId == null)
+              const PopupMenuItem(value: 'edit', child: Text('Chỉnh sửa')),
             if (target != null)
               const PopupMenuItem(value: 'map', child: Text('Mở bản đồ')),
-            const PopupMenuItem(value: 'delete', child: Text('Xóa hoạt động')),
+            PopupMenuItem(
+              value: 'delete',
+              child: Text(
+                item.bookingId == null
+                    ? 'Xóa hoạt động'
+                    : 'Gỡ vé khỏi lịch trình',
+              ),
+            ),
           ],
         ),
       ),
