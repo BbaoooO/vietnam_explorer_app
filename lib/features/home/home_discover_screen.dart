@@ -1,13 +1,15 @@
 import 'package:android_project/core/app_nav.dart';
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:provider/provider.dart';
-
 import '../../core/models/destination.dart';
 import '../../core/models/experience_booking.dart';
 import '../../core/models/tourism_place.dart';
 import '../../core/models/travel_records.dart';
 import '../../core/providers/travel_data.dart';
 import '../booking/experience_booking_screen.dart';
+import '../../core/services/location_weather_service.dart';
+import '../../core/services/shared_avatar_service.dart';
 //nạp lớp điều bộ appNav & thư viện giao diện Material
 
 class HomeDiscoverScreen extends StatefulWidget
@@ -22,6 +24,38 @@ class HomeDiscoverScreen extends StatefulWidget
 }
 class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này chứa dữ liệu trạng thái, các hàm xử lý và hàm build()
 {
+  String _currentCity = 'Đang xác định...';
+  String _currentTemperature = '--°C';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRealWeather();
+  }
+  Future<void> _loadRealWeather() async {
+    try {
+      final data = await LocationWeatherService.load();
+
+      if (!mounted) return;
+      setState(() {
+        _currentCity = (data['city'] ?? 'Vị trí hiện tại').toString();
+        final temp = data['temperature'];
+        _currentTemperature = temp == null ? '--°C' : '${temp}°C';
+      });
+      debugPrint('THANH PHO: ${data['city']}');
+      debugPrint('NHIET DO: ${data['temperature']}°C');
+      debugPrint('VI DO: ${data['latitude']}');
+      debugPrint('KINH DO: ${data['longitude']}');
+    } catch (e) {
+      debugPrint('LOI GPS/THOI TIET: $e');
+      if (mounted) {
+        setState(() {
+          _currentCity = 'Không lấy được vị trí';
+          _currentTemperature = '--°C';
+        });
+      }
+    }
+  }
   // màu sắc, controller và biến trang thái
   static const Color _background = Color(0xFFF4F6F4);
   static const Color _surface = Colors.white;
@@ -32,6 +66,60 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
   static const Color _line = Color(0xFFE2E7E4);
   static const Color _gold = Color(0xFFE6A524); //_gold màu sao đánh giá
   static const Color _stamp = Color(0xFFB3362E); //_stamp màu đỏ của dấu và trái tim đã chọn
+
+  final stt.SpeechToText _speech = stt.SpeechToText();
+  bool _isListening = false;
+
+  Future<void> _toggleVoiceSearch() async {
+    if (_isListening) {
+      await _speech.stop();
+      if (mounted) setState(() => _isListening = false);
+      return;
+    }
+    try {
+      final available = await _speech.initialize(
+        onStatus: (status) {
+          if (status == 'done' || status == 'notListening') {
+            if (mounted) setState(() => _isListening = false);
+          }
+        },
+        onError: (error) {
+          if (mounted) {
+            setState(() => _isListening = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Voice search: ${error.errorMsg}')),
+            );
+          }
+        },
+      );
+      if (!mounted) return;
+      if (!available) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Không thể sử dụng micro. Hãy kiểm tra quyền micro.')),
+        );
+        return;
+      }
+      setState(() => _isListening = true);
+      await _speech.listen(
+        localeId: 'vi_VN',
+        onResult: (result) {
+          if (!mounted) return;
+          final words = result.recognizedWords;
+          _searchController.value = TextEditingValue(
+            text: words,
+            selection: TextSelection.collapsed(offset: words.length),
+          );
+          setState(() => _query = words);
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isListening = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Không khởi động được tìm kiếm giọng nói: $e')),
+      );
+    }
+  }
 
   final TextEditingController _searchController = TextEditingController();
   //quản lý nội dung ô nhập _searchController.clear() xóa chữ đang hiển thị
@@ -52,9 +140,68 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
 
   List<Destination> get _destinations => context.read<TravelData>().destinations;
 
+  // Translate place names for display only. Keep original data and IDs unchanged.
+  String _placeName(String name) {
+    const names = <String, String>{
+      'Ha Long Bay': 'Vịnh Hạ Long',
+      'Halong Bay': 'Vịnh Hạ Long',
+      'Ha Long': 'Hạ Long',
+      'Halong': 'Hạ Long',
+      'Hoi An': 'Hội An',
+      'Hanoi': 'Hà Nội',
+      'Ha Noi': 'Hà Nội',
+      'Sapa': 'Sa Pa',
+      'Sa Pa': 'Sa Pa',
+      'Da Nang': 'Đà Nẵng',
+      'Danang': 'Đà Nẵng',
+      'Da Lat': 'Đà Lạt',
+      'Dalat': 'Đà Lạt',
+      'Hue': 'Huế',
+      'Ninh Binh': 'Ninh Bình',
+      'Trang An': 'Tràng An',
+      'Nha Trang': 'Nha Trang',
+      'Phu Quoc': 'Phú Quốc',
+      'Ho Chi Minh City': 'Thành phố Hồ Chí Minh',
+      'Ho Chi Minh': 'Hồ Chí Minh',
+      'Mekong Delta': 'Đồng bằng sông Cửu Long',
+      'Phong Nha': 'Phong Nha',
+      'Quy Nhon': 'Quy Nhơn',
+      'Mui Ne': 'Mũi Né',
+      'Can Tho': 'Cần Thơ',
+    };
+    var result = name;
+    for (final entry in names.entries) {
+      result = result.replaceAllMapped(
+        RegExp(RegExp.escape(entry.key), caseSensitive: false),
+        (_) => entry.value,
+      );
+    }
+    return result;
+  }
+
+  String _searchKey(String value) {
+    const accents = <String, String>{
+      'àáạảãâầấậẩẫăằắặẳẵ': 'a',
+      'èéẹẻẽêềếệểễ': 'e',
+      'ìíịỉĩ': 'i',
+      'òóọỏõôồốộổỗơờớợởỡ': 'o',
+      'ùúụủũưừứựửữ': 'u',
+      'ỳýỵỷỹ': 'y',
+      'đ': 'd',
+    };
+    var result = value.toLowerCase();
+    for (final entry in accents.entries) {
+      for (final char in entry.key.split('')) {
+        result = result.replaceAll(char, entry.value);
+      }
+    }
+    return result;
+  }
+
+
   final List<_Experience> _experiences = const <_Experience>[
     _Experience(
-      title: 'Ha Long Cruise',
+      title: 'Hạ Long Cruise',
       subtitle: 'Wake up among limestone islands',
       duration: '2 days',
       image: 'assets/images/halong.jpg',
@@ -63,12 +210,12 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
     _Experience(
       title: BookableExperience.lanternNightWalkTitle,
       offer: BookableExperience.lanternNightWalk,
-      subtitle: 'A calm evening in Hoi An',
+      subtitle: 'A calm evening in Hội An',
       duration: '3 hours',
       image: 'assets/images/hoian.jpg',
     ),
     _Experience(
-      title: 'Hanoi City Walk',
+      title: 'Hà Nội City Walk',
       subtitle: 'Food, history and hidden corners',
       duration: '4 hours',
       image: 'assets/images/hanoi.jpg',
@@ -89,16 +236,17 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
   List<Destination> get _filteredDestinations
   //getter tao danh sách phù hợp với lựa chọn hiện tại
   {
-    final q = _query.trim().toLowerCase();
+    final q = _searchKey(_query.trim());
     return _destinations.where((item)
     //duyệt địa điểm và chỉ giữ phần tử thỏa điều kiện
     {
       final regionMatch = _selectedRegion == 'All' || item.region == _selectedRegion;
       //địa điểm đạt điều kiện khu vực nếu: Chọn All hoặc khu vực địa điểm trùng khu vực đã chọn
       final queryMatch = q.isEmpty ||
-          item.title.toLowerCase().contains(q) ||
-          item.subtitle.toLowerCase().contains(q) ||
-          item.region.toLowerCase().contains(q);
+          _searchKey(_placeName(item.title)).contains(q) ||
+          _searchKey(item.title).contains(q) ||
+          _searchKey(item.subtitle).contains(q) ||
+          _searchKey(item.region).contains(q);
       //đạt điều kiện tìm kiếm nếu từ khóa rỗng hoặc xuất hiện trong ít nhất 1 trường: tên, mô tả ngắn, khu vực
       return regionMatch && queryMatch;//điều kiện phải thỏa cả 2 điều kiện
     }).toList();//chuyển kết quả lọc thành danh sách
@@ -111,6 +259,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
   @override
   void dispose() //dispose() được gọi khi đôí tượng State bị hủy
   {
+    _speech.stop();
     _searchController.dispose();
     _heroController.dispose();
     //hai controller được giải phóng tài nguyên
@@ -188,7 +337,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            item.title,
+                            _placeName(item.title),
                             style: const TextStyle(
                               color: _text,
                               fontSize: 26,
@@ -276,12 +425,12 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                 ),
                 if (places.isNotEmpty) ...[
                   const SizedBox(height: 20),
-                  Text('Places in ${item.title}', style: Theme.of(context).textTheme.titleMedium),
+                  Text('Places in ${_placeName(item.title)}', style: Theme.of(context).textTheme.titleMedium),
                   for (final place in places)
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.place_outlined),
-                      title: Text(place.name),
+                      title: Text(_placeName(place.name)),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
                         Navigator.popUntil(context, (route) => route.isFirst);
@@ -330,7 +479,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  item.title,
+                  _placeName(item.title),
                   style: const TextStyle(
                     color: _text,
                     fontSize: 24,
@@ -450,7 +599,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                       for (final place in places)
                         ListTile(
                           leading: const Icon(Icons.place_outlined),
-                          title: Text(place.name),
+                          title: Text(_placeName(place.name)),
                           subtitle: Text(place.province),
                           trailing: IconButton(
                             tooltip: 'Remove from saved places',
@@ -520,30 +669,31 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
       child: Row //header dùng row để xếp ngang
         (
         children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: const BoxDecoration(color: _primary, shape: BoxShape.circle),
-            alignment: Alignment.center,
-            child: const Icon(Icons.person_rounded, color: Colors.white, size: 24),
+          ValueListenableBuilder<String>(
+            valueListenable: SharedAvatarService.avatarUrl,
+            builder: (context, avatar, _) => CircleAvatar(
+              radius: 23,
+              backgroundColor: _primary,
+              backgroundImage: NetworkImage(avatar),
+            ),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Welcome back', style: TextStyle(color: _muted, fontSize: 12)),
+                const Text('Welcome back', style: TextStyle(color: _muted, fontSize: 12)),
                 SizedBox(height: 2),
                 Row(
                   children: [
-                    Icon(Icons.location_on_rounded, color: _primary, size: 17),
-                    SizedBox(width: 3),
+                    const Icon(Icons.location_on_rounded, color: _primary, size: 17),
+                    const SizedBox(width: 3),
                     Flexible(
                       child: Text(
-                        'Hanoi, Vietnam',
+                        _currentCity,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: _text,
                           fontSize: 17,
                           fontWeight: FontWeight.w800,
@@ -563,13 +713,13 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
               borderRadius: BorderRadius.circular(999),
               border: Border.all(color: _line),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.wb_sunny_rounded, color: _gold, size: 17),
+                const Icon(Icons.wb_sunny_rounded, color: _gold, size: 17),
                 SizedBox(width: 5),
                 Text(
-                  '28°C',
-                  style: TextStyle(color: _text, fontSize: 12.5, fontWeight: FontWeight.w700),
+                  _currentTemperature,
+                  style: const TextStyle(color: _text, fontSize: 12.5, fontWeight: FontWeight.w700),
                 ),
               ],
             ),
@@ -629,8 +779,15 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
           hintText: 'Where do you want to go?',
           hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 14.5),
           prefixIcon: const Icon(Icons.search_rounded, color: _primary),
-          suffixIcon: _query.isEmpty
-              ? const Icon(Icons.mic_none_rounded, color: _primary)
+          suffixIcon: _query.isEmpty || _isListening
+              ? IconButton(
+                  tooltip: _isListening ? 'Dừng nghe' : 'Tìm bằng giọng nói',
+                  onPressed: _toggleVoiceSearch,
+                  icon: Icon(
+                    _isListening ? Icons.mic_rounded : Icons.mic_none_rounded,
+                    color: _isListening ? Colors.red : _primary,
+                  ),
+                )
               : IconButton(
             onPressed: () {
               _searchController.clear();
@@ -768,7 +925,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            item.title,
+                            _placeName(item.title),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -929,7 +1086,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    item.title,
+                    _placeName(item.title),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -1044,7 +1201,7 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            item.title,
+                            _placeName(item.title),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
