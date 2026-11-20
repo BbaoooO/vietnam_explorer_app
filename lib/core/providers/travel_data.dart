@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/destination.dart';
+import '../models/experience_booking.dart';
 import '../models/tourism_place.dart';
 import '../models/travel_records.dart';
 import '../repositories/travel_repository.dart';
@@ -26,6 +27,7 @@ class TravelData extends ChangeNotifier {
   List<String> get recent => _records?.recent ?? const [];
   List<Trip> get trips => _records?.trips ?? const [];
   List<TripActivity> get activities => _records?.activities ?? const [];
+  List<ExperienceBooking> get bookings => _records?.bookings ?? const [];
   Map<String, DateTime> get visits => _records?.visits ?? const {};
   Set<String> get visitedAreas => {
     for (final id in visits.keys)
@@ -103,6 +105,26 @@ class TravelData extends ChangeNotifier {
 
   Future<void> deleteActivity(int id) =>
       _mutate(() => _repository.deleteActivity(uid, id));
+
+  Future<ExperienceBooking> bookDemoExperience({
+    required String id,
+    required String experienceId,
+    required String day,
+    required int minute,
+    required int guests,
+  }) => _mutate(
+    () => _repository.bookDemoExperience(
+      uid,
+      id: id,
+      experienceId: experienceId,
+      day: day,
+      minute: minute,
+      guests: guests,
+    ),
+  );
+
+  Future<void> addBookingToTrip(String bookingId, int tripId) =>
+      _mutate(() => _repository.addBookingToTrip(uid, bookingId, tripId));
 
   @override
   void dispose() {

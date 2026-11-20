@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/models/destination.dart';
+import '../../core/models/experience_booking.dart';
 import '../../core/models/tourism_place.dart';
 import '../../core/models/travel_records.dart';
 import '../../core/providers/travel_data.dart';
+import '../booking/experience_booking_screen.dart';
 //nạp lớp điều bộ appNav & thư viện giao diện Material
 
 class HomeDiscoverScreen extends StatefulWidget
@@ -59,7 +61,8 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
     ),
     //mỗi trải nghiệm có tên, mô tả, thời lượng và ảnh
     _Experience(
-      title: 'Lantern Night Walk',
+      title: BookableExperience.lanternNightWalkTitle,
+      offer: BookableExperience.lanternNightWalk,
       subtitle: 'A calm evening in Hoi An',
       duration: '3 hours',
       image: 'assets/images/hoian.jpg',
@@ -296,6 +299,10 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
 //chi tiết trải nghiệm
   void _openExperience(_Experience item) //_openExperience() tạo bottom Sheet
   {
+    final data = context.read<TravelData>();
+    final navigator = Navigator.of(context);
+    final navigation = context.read<AppNav>();
+    final offer = item.offer;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -348,18 +355,37 @@ class _HomeDiscoverScreenState extends State<HomeDiscoverScreen> //lớp này ch
                   ],
                 ),
                 const SizedBox(height: 18),
-                FilledButton(
+                if (offer != null) ...[
+                  FilledButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      navigator.push(MaterialPageRoute<void>(
+                        builder: (_) => ChangeNotifierProvider.value(
+                          value: data,
+                          child: ExperienceBookingScreen(offer: offer),
+                        ),
+                      ));
+                    },
+                    icon: const Icon(Icons.confirmation_number_outlined),
+                    label: const Text('Đặt vé thử'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: _primary,
+                      minimumSize: const Size.fromHeight(52),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                OutlinedButton(
                   onPressed: () {
                     Navigator.pop(context); //đóng bảng hiện tại
-                    this.context.read<AppNav>().openPlanner((title: item.title, target: null));
+                    navigation.openPlanner((title: item.title, target: offer == null ? null : placeRef(offer.placeId)));
                   },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: _primary,
-                    foregroundColor: Colors.white,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: _primary,
                     minimumSize: const Size.fromHeight(52),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: const Text('Add to planner'),
+                  child: const Text('Thêm vào lịch trình'),
                 ),
               ],
             ),
@@ -1252,11 +1278,13 @@ class _Experience {
   final String subtitle;
   final String duration;
   final String image;
+  final BookableExperience? offer;
 
   const _Experience({
     required this.title,
     required this.subtitle,
     required this.duration,
     required this.image,
+    this.offer,
   });
 }

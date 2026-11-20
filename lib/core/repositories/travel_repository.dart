@@ -6,6 +6,7 @@ import '../data/destination_seed.dart';
 import '../data/place_seed.dart';
 import '../data/travel_schema.dart';
 import '../models/destination.dart';
+import '../models/experience_booking.dart';
 import '../models/tourism_place.dart';
 import '../models/travel_records.dart';
 
@@ -14,6 +15,7 @@ typedef UserTravelRecords = ({
   List<String> recent,
   List<Trip> trips,
   List<TripActivity> activities,
+  List<ExperienceBooking> bookings,
   Map<String, DateTime> visits,
   bool legacyClaimed,
 });
@@ -34,9 +36,12 @@ class TravelRepository {
     return _factory.openDatabase(
       file,
       options: OpenDatabaseOptions(
-        version: 1,
+        version: 2,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
         onCreate: _create,
+        onUpgrade: (db, from, _) async {
+          if (from < 2) await _createBookingSchema(db);
+        },
       ),
     );
   }
@@ -61,6 +66,7 @@ class TravelRepository {
     for (final statement in travelSchema) {
       await db.execute(statement);
     }
+    await _createBookingSchema(db);
     final batch = db.batch();
     for (final (index, destination) in destinationSeed.indexed) {
       batch.insert('destinations', {
@@ -100,6 +106,115 @@ class TravelRepository {
       });
     }
     await batch.commit(noResult: true);
+  }
+
+  Future<void> _createBookingSchema(Database db) async {
+    for (final statement in bookingSchema) {
+      await db.execute(statement);
+    }
+  }
+
+  Future<List<Map<String, Object?>>> _bookingRows(
+    DatabaseExecutor db,
+    String uid, {
+    String? id,
+  }) => db.rawQuery(
+    '''
+    SELECT booking.*, item.trip_id
+    FROM experience_bookings booking
+    LEFT JOIN trip_items item
+      ON item.booking_id = booking.id AND item.user_id = booking.user_id
+    WHERE booking.user_id = ? ${id == null ? '' : 'AND booking.id = ?'}
+    ORDER BY booking.created_at DESC, booking.id
+    ''',
+    [uid, if (id != null) id],
+  );
+
+  Future<ExperienceBooking> bookDemoExperience(
+    String uid, {
+    required String id,
+    required String experienceId,
+    required String day,
+    required int minute,
+    required int guests,
+  }) async {
+    final offer = BookableExperience.find(experienceId);
+    if (offer == null ||
+        !offer.startMinutes.contains(minute) ||
+        guests < 1 ||
+        guests > offer.maxGuests ||
+        !RegExp(r'^VE-[A-F0-9]{16}$').hasMatch(id)) {
+      throw ArgumentError('Invalid experience booking.');
+    }
+    return (await _database).transaction<ExperienceBooking>((txn) async {
+      final rows = await _bookingRows(txn, uid, id: id);
+      if (rows.isNotEmpty) {
+        final existing = ExperienceBooking.fromRow(rows.single);
+        if (existing.experienceId != experienceId ||
+            existing.day != day ||
+            existing.minute != minute ||
+            existing.guests != guests) {
+          throw StateError('Booking reference already used.');
+        }
+        return existing;
+      }
+      if (!isFutureExperienceSlot(day, minute)) {
+        throw ArgumentError('Choose a future time slot in Vietnam.');
+      }
+      await txn.insert('experience_bookings', {
+        'id': id,
+        'user_id': uid,
+        'experience_id': offer.id,
+        'title': offer.title,
+        'place_id': offer.placeId,
+        'day': day,
+        'minute': minute,
+        'guests': guests,
+        'unit_price_vnd': offer.priceVnd,
+        'created_at': DateTime.now().millisecondsSinceEpoch,
+      });
+      return ExperienceBooking.fromRow(
+        (await _bookingRows(txn, uid, id: id)).single,
+      );
+    });
+  }
+
+  Future<void> addBookingToTrip(
+    String uid,
+    String bookingId,
+    int tripId,
+  ) async {
+    final db = await _database;
+    await db.transaction((txn) async {
+      final bookings = await _bookingRows(txn, uid, id: bookingId);
+      if (bookings.isEmpty)
+        throw StateError('Booking not found for this account.');
+      final booking = ExperienceBooking.fromRow(bookings.single);
+      if (booking.tripId == tripId) return;
+      if (booking.tripId != null)
+        throw StateError('Booking is already on a trip.');
+
+      final trips = await txn.query(
+        'trips',
+        where: 'user_id = ? AND id = ?',
+        whereArgs: [uid, tripId],
+      );
+      if (trips.isEmpty || !booking.fits(Trip.fromRow(trips.single))) {
+        throw ArgumentError('Choose a trip that covers the booking date.');
+      }
+
+      await txn.insert('trip_items', {
+        'user_id': uid,
+        'trip_id': tripId,
+        'booking_id': booking.id,
+        'place_id': booking.placeId,
+        'title': booking.title,
+        'notes': 'Vé thử ${booking.id} · ${booking.guests} khách',
+        'day': booking.day,
+        'minute': booking.minute,
+        'cost_vnd': booking.totalVnd,
+      });
+    });
   }
 
   Future<List<Destination>> loadDestinations() async {
@@ -175,6 +290,7 @@ class TravelRepository {
       final trips = await rows('trips', orderBy: 'start_day, id');
       final activities = await rows('trip_items', orderBy: 'day, minute, id');
       final visits = await rows('visits');
+      final bookings = await _bookingRows(txn, uid);
       final legacy = await txn.query(
         'device_migrations',
         where: 'id = ?',
@@ -190,6 +306,9 @@ class TravelRepository {
         trips: List<Trip>.unmodifiable(trips.map(Trip.fromRow)),
         activities: List<TripActivity>.unmodifiable(
           activities.map(TripActivity.fromRow),
+        ),
+        bookings: List<ExperienceBooking>.unmodifiable(
+          bookings.map(ExperienceBooking.fromRow),
         ),
         visits: Map<String, DateTime>.unmodifiable({
           for (final row in visits)
@@ -332,7 +451,8 @@ class TravelRepository {
         final updated = await txn.update(
           'trip_items',
           values,
-          where: 'user_id = ? AND trip_id = ? AND id = ?',
+          where:
+              'user_id = ? AND trip_id = ? AND id = ? AND booking_id IS NULL',
           whereArgs: [uid, activity.tripId, activity.id],
         );
         if (updated != 1) throw StateError('Activity no longer exists.');

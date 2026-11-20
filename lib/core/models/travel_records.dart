@@ -39,6 +39,7 @@ class TripActivity {
     required this.costVnd,
     required this.completed,
     required this.target,
+    this.bookingId,
   });
 
   final int id;
@@ -50,6 +51,7 @@ class TripActivity {
   final int? costVnd;
   final bool completed;
   final CatalogRef? target;
+  final String? bookingId;
 
   factory TripActivity.fromRow(Map<String, Object?> row) => TripActivity(
     id: row['id'] as int,
@@ -61,6 +63,7 @@ class TripActivity {
     costVnd: row['cost_vnd'] as int?,
     completed: row['completed'] == 1,
     target: catalogRefFromRow(row),
+    bookingId: row['booking_id'] as String?,
   );
 }
 

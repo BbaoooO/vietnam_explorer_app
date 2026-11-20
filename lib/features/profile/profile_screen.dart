@@ -6,6 +6,7 @@ import '../../core/app_nav.dart';
 import '../../core/explorer_app_bar.dart';
 import '../../core/models/travel_records.dart';
 import '../../core/providers/travel_data.dart';
+import '../booking/my_tickets_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -717,6 +718,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void _openMyTickets() {
+    final data = context.read<TravelData>();
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => ChangeNotifierProvider.value(
+        value: data,
+        child: const MyTicketsScreen(),
+      ),
+    ));
+  }
+
   Widget _buildActionMenu(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -739,6 +750,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 true, onTap: _showPersonalDetailsSheet),
             _buildMenuItem(context, Icons.favorite_border,
                 'Saved Destinations', true, onTap: _showSavedDestinationsSheet),
+            _buildMenuItem(context, Icons.confirmation_number_outlined, 'Vé của tôi',
+                true, onTap: _openMyTickets),
             _buildMenuItem(context, Icons.settings_outlined, 'Settings', true,
                 onTap: _showSettingsSheet),
             _buildMenuItem(context, Icons.help_outline, 'Help & Support', true,

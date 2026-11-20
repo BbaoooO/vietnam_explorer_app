@@ -95,3 +95,23 @@ const travelSchema = <String>[
   'CREATE INDEX items_schedule ON trip_items(user_id, trip_id, day, minute)',
   'CREATE INDEX recent_order ON recent_places(user_id, viewed_at DESC)',
 ];
+
+const bookingSchema = <String>[
+  '''
+  CREATE TABLE experience_bookings (
+    id TEXT PRIMARY KEY NOT NULL,
+    user_id TEXT NOT NULL,
+    experience_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    place_id TEXT NOT NULL REFERENCES places(id),
+    day TEXT NOT NULL,
+    minute INTEGER NOT NULL CHECK (minute BETWEEN 0 AND 1439),
+    guests INTEGER NOT NULL CHECK (guests > 0),
+    unit_price_vnd INTEGER NOT NULL CHECK (unit_price_vnd >= 0),
+    created_at INTEGER NOT NULL
+  )
+  ''',
+  'CREATE INDEX bookings_by_user ON experience_bookings(user_id, created_at DESC)',
+  'ALTER TABLE trip_items ADD COLUMN booking_id TEXT REFERENCES experience_bookings(id)',
+  'CREATE UNIQUE INDEX trip_items_booking ON trip_items(booking_id)',
+];
