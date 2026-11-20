@@ -35,7 +35,6 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
   int? _minute;
   int _guests = 1;
   bool _saving = false;
-  bool _reviewing = false;
   String? _error;
   ExperienceBooking? _booking;
   final _bookingCodes = <(String, int, int), String>{};
@@ -57,53 +56,6 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
     });
   }
 
-  Future<void> _reviewOrder(int minute) async {
-    if (_reviewing || _saving) return;
-    final day = experienceDay(_day);
-    final guests = _guests;
-    final offer = widget.offer;
-    setState(() => _reviewing = true);
-    final confirmed = await showModalBottomSheet<bool>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (sheetContext) => SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Kiểm tra đơn đặt vé',
-                style: Theme.of(sheetContext).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 12),
-              Text(offer.title),
-              Text(
-                '${formatTicketDay(day)} · ${formatTicketTime(minute)} · $guests khách',
-              ),
-              const Divider(height: 24),
-              _PaymentSummary(total: offer.priceVnd * guests),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  style: FilledButton.styleFrom(backgroundColor: _brandGreen),
-                  onPressed: () => Navigator.pop(sheetContext, true),
-                  child: const Text('Xác nhận đặt vé'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    if (!mounted) return;
-    setState(() => _reviewing = false);
-    if (confirmed == true) await _placeOrder(minute);
-  }
-
   Future<void> _placeOrder(int minute) async {
     if (_saving || _booking != null) return;
     final day = experienceDay(_day);
@@ -122,7 +74,7 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
       _error = null;
     });
     try {
-      final ticket = await data.bookExperienceAtVenue(
+      final ticket = await data.confirmExperienceCheckout(
         id: _bookingCodes.putIfAbsent(key, _newBookingCode),
         experienceId: widget.offer.id,
         day: day,
@@ -133,7 +85,7 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
     } catch (_) {
       if (mounted)
         setState(
-          () => _error = 'Chưa lưu được đơn đặt vé. Vui lòng xác nhận lại.',
+          () => _error = 'Chưa hoàn tất đặt vé. Vui lòng bấm Thanh toán lại.',
         );
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -156,7 +108,7 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            booking == null ? 'Đặt vé trải nghiệm' : 'Đã lưu đơn đặt vé',
+            booking == null ? 'Đặt vé trải nghiệm' : 'Đặt vé thành công',
           ),
         ),
         body: SafeArea(
@@ -164,7 +116,19 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
             padding: const EdgeInsets.all(20),
             children: booking != null
                 ? [
-                    const Text('Xem chi tiết trong Hồ sơ → Vé của tôi.'),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Icon(
+                        Icons.check_circle,
+                        size: 42,
+                        color: _brandGreen,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Vé của bạn đã được lưu. Bạn có thể xem lại trong Hồ sơ → Vé của tôi.',
+                    ),
+
                     const SizedBox(height: 12),
                     ExperienceTicketCard(bookingId: booking.id),
                     const SizedBox(height: 16),
@@ -244,15 +208,14 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
                     FilledButton(
                       onPressed:
                           _saving ||
-                              _reviewing ||
                               minute == null ||
                               !availableSlots.contains(minute)
                           ? null
-                          : () => _reviewOrder(minute),
+                          : () => _placeOrder(minute),
                       style: FilledButton.styleFrom(
                         backgroundColor: _brandGreen,
                       ),
-                      child: Text(_saving ? 'Đang lưu đơn…' : 'Tiếp tục'),
+                      child: Text(_saving ? 'Đang xác nhận…' : 'Thanh toán'),
                     ),
                   ],
           ),
@@ -283,16 +246,8 @@ class _PaymentSummary extends StatelessWidget {
                 ?.copyWith(color: _brandGreen, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          const Row(
-            children: [
-              Icon(Icons.payments_outlined, color: _brandGreen),
-              SizedBox(width: 8),
-              Expanded(child: Text('Thanh toán tại điểm đến')),
-            ],
-          ),
-          const SizedBox(height: 6),
           const Text(
-            'App ghi nhận đơn trên thiết bị. Bạn chỉ thanh toán tại điểm đến sau khi đơn vị tổ chức xác nhận chỗ.',
+            'Xác nhận ngay trong app, không phát sinh giao dịch chuyển tiền.',
           ),
         ],
       ),

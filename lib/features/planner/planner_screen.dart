@@ -261,7 +261,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
             time.format(context),
             if (item.costVnd != null && item.bookingId == null)
               '${item.costVnd} VND',
-            if (item.bookingId != null) 'Chưa thanh toán · ${item.costVnd} VND',
+            if (item.bookingId != null) 'Giá vé ${item.costVnd} VND',
             if (item.notes.isNotEmpty) item.notes,
           ].join(' · '),
         ),

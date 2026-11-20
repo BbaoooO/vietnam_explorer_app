@@ -128,3 +128,14 @@ const bookingPaymentSchema = <String>[
   WHERE booking_id IS NOT NULL AND substr(notes, 1, length('Vé thử ')) = 'Vé thử '
   ''',
 ];
+
+const bookingCheckoutSchema = <String>[
+  '''
+  ALTER TABLE experience_bookings ADD COLUMN checkout_confirmed INTEGER
+    NOT NULL DEFAULT 0 CHECK (checkout_confirmed IN (0, 1))
+  ''',
+  '''
+  UPDATE experience_bookings SET checkout_confirmed = 1
+  WHERE payment_method = 'legacy_local'
+  ''',
+];

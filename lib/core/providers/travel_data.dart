@@ -106,14 +106,14 @@ class TravelData extends ChangeNotifier {
   Future<void> deleteActivity(int id) =>
       _mutate(() => _repository.deleteActivity(uid, id));
 
-  Future<ExperienceBooking> bookExperienceAtVenue({
+  Future<ExperienceBooking> confirmExperienceCheckout({
     required String id,
     required String experienceId,
     required String day,
     required int minute,
     required int guests,
   }) => _mutate(
-    () => _repository.bookExperienceAtVenue(
+    () => _repository.confirmExperienceCheckout(
       uid,
       id: id,
       experienceId: experienceId,

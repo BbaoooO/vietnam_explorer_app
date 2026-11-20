@@ -32,8 +32,6 @@ class BookableExperience {
   final int maxGuests;
 }
 
-enum BookingPaymentMethod { legacyLocal, payAtVenue }
-
 class ExperienceBooking {
   const ExperienceBooking({
     required this.id,
@@ -45,7 +43,7 @@ class ExperienceBooking {
     required this.guests,
     required this.unitPriceVnd,
     required this.tripId,
-    required this.paymentMethod,
+    required this.checkoutConfirmed,
   });
 
   final String id;
@@ -57,7 +55,7 @@ class ExperienceBooking {
   final int guests;
   final int unitPriceVnd;
   final int? tripId;
-  final BookingPaymentMethod paymentMethod;
+  final bool checkoutConfirmed;
 
   int get totalVnd => guests * unitPriceVnd;
 
@@ -75,10 +73,7 @@ class ExperienceBooking {
         guests: row['guests'] as int,
         unitPriceVnd: row['unit_price_vnd'] as int,
         tripId: row['trip_id'] as int?,
-        paymentMethod: switch (row['payment_method']) {
-          'pay_at_venue' => BookingPaymentMethod.payAtVenue,
-          _ => BookingPaymentMethod.legacyLocal,
-        },
+        checkoutConfirmed: row['checkout_confirmed'] == 1,
       );
 }
 
