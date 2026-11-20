@@ -19,10 +19,10 @@ class MyTicketsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final tickets = context.watch<TravelData>().bookings;
     return Scaffold(
-      appBar: AppBar(title: const Text('Vé của tôi')),
+      appBar: AppBar(title: const Text('My Tickets')),
       body: SafeArea(
         child: tickets.isEmpty
-            ? const Center(child: Text('Bạn chưa có vé trải nghiệm.'))
+            ? const Center(child: Text('You do not have any tickets yet.'))
             : ListView.separated(
                 padding: const EdgeInsets.all(16),
                 itemCount: tickets.length,
@@ -57,7 +57,7 @@ class _ExperienceTicketCardState extends State<ExperienceTicketCard> {
       final selection = await showDialog<int>(
         context: context,
         builder: (context) => SimpleDialog(
-          title: const Text('Chọn chuyến đi'),
+          title: const Text('Select a trip'),
           children: [
             for (final trip in eligible)
               SimpleDialogOption(
@@ -72,7 +72,7 @@ class _ExperienceTicketCardState extends State<ExperienceTicketCard> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Chưa thêm được vé vào chuyến đi.')),
+        const SnackBar(content: Text('Could not add the ticket to the trip.')),
       );
     } finally {
       if (mounted) setState(() => _choosingTrip = false);
@@ -99,28 +99,28 @@ class _ExperienceTicketCardState extends State<ExperienceTicketCard> {
             Text(ticket.title, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 6),
             Text(
-              '${formatTicketDay(ticket.day)} · ${formatTicketTime(ticket.minute)} giờ Việt Nam · ${ticket.guests} khách',
+              '${formatTicketDay(ticket.day)} · ${formatTicketTime(ticket.minute)} Vietnam time · ${ticket.guests} guest${ticket.guests == 1 ? '' : 's'}',
             ),
             const SizedBox(height: 6),
-            SelectableText('Mã vé ${ticket.id}'),
+            SelectableText('Ticket reference: ${ticket.id}'),
             const SizedBox(height: 8),
             Text(
-              ticket.checkoutConfirmed ? 'Đã đặt vé' : 'Đã lưu đơn',
+              ticket.checkoutConfirmed ? 'Booked' : 'Order saved',
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
-            Text('Tổng tiền · ${formatTicketVnd(ticket.totalVnd)}'),
+            Text('Total · ${formatTicketVnd(ticket.totalVnd)}'),
             const SizedBox(height: 8),
             if (trip != null)
-              Text('Trong chuyến đi ${trip.title}')
+              Text('Added to ${trip.title}')
             else if (canLink)
               OutlinedButton.icon(
                 onPressed: _choosingTrip ? null : () => _chooseTrip(ticket),
                 icon: const Icon(Icons.event_available_outlined),
-                label: const Text('Thêm vào lịch trình'),
+                label: const Text('Add to Planner'),
               )
             else
               const Text(
-                'Tạo chuyến đi bao gồm ngày trên vé để thêm vào lịch trình.',
+                'Create a trip that covers the ticket date to add it to your itinerary.',
               ),
           ],
         ),

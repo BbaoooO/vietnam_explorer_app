@@ -139,3 +139,11 @@ const bookingCheckoutSchema = <String>[
   WHERE payment_method = 'legacy_local'
   ''',
 ];
+
+const englishBookingNotesMigration = """
+  UPDATE trip_items
+  SET notes = 'Ticket reference: ' || booking_id || ' · ' ||
+    (SELECT guests || CASE WHEN guests = 1 THEN ' guest' ELSE ' guests' END
+     FROM experience_bookings WHERE id = trip_items.booking_id)
+  WHERE booking_id IS NOT NULL AND substr(notes, 1, length('Mã vé ')) = 'Mã vé '
+  """;

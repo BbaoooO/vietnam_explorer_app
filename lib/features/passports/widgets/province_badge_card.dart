@@ -19,14 +19,14 @@ class ProvinceBadgeCard extends StatelessWidget {
         if (unlocked) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Huy hiệu ${province!.name}: Bạn đã mở khóa khu vực này!'),
+              content: Text('You unlocked the ${province!.name} badge.'),
               behavior: SnackBarBehavior.floating,
             ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Hãy đi du lịch thêm để mở khóa huy hiệu bí ẩn này nhé!'),
+              content: Text('Explore more places to unlock this badge.'),
               behavior: SnackBarBehavior.floating,
             ),
           );

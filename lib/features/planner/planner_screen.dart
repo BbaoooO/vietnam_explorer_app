@@ -26,7 +26,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Chưa cập nhật được lịch trình. Hãy thử lại.'),
+        content: Text('Could not update the itinerary. Please try again.'),
       ),
     );
   }
@@ -87,18 +87,16 @@ class _PlannerScreenState extends State<PlannerScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xóa chuyến đi?'),
-        content: Text(
-          'Các hoạt động trong chuyến “${trip.title}” cũng sẽ bị xóa.',
-        ),
+        title: const Text('Delete trip?'),
+        content: Text('Activities in “${trip.title}” will also be deleted.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: const Text('Cancel'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Xóa'),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -125,7 +123,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
           : FloatingActionButton.extended(
               onPressed: _busy ? null : () => _editActivity(trip),
               icon: const Icon(Icons.add),
-              label: const Text('Thêm hoạt động'),
+              label: const Text('Add activity'),
             ),
       body: ValueListenableBuilder<PlanDraft?>(
         valueListenable: navigation.plannerDraft,
@@ -133,7 +131,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
           children: [
             Text(
-              'Lịch trình chuyến đi',
+              'Trip itinerary',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 12),
@@ -144,8 +142,8 @@ class _PlannerScreenState extends State<PlannerScreen> {
                   title: Text(draft.title),
                   subtitle: Text(
                     trip == null
-                        ? 'Tạo một chuyến đi để thêm hoạt động này.'
-                        : 'Sẵn sàng thêm vào ${trip.title}',
+                        ? 'Create a trip to add this activity.'
+                        : 'Ready to add to ${trip.title}',
                   ),
                   onTap: _busy || trip == null
                       ? null
@@ -155,14 +153,14 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     children: [
                       if (trip != null)
                         IconButton(
-                          tooltip: 'Thêm địa điểm vào chuyến đi',
+                          tooltip: 'Add place to trip',
                           onPressed: _busy
                               ? null
                               : () => _editActivity(trip, draft: draft),
                           icon: const Icon(Icons.add),
                         ),
                       IconButton(
-                        tooltip: 'Bỏ đề xuất',
+                        tooltip: 'Dismiss suggestion',
                         onPressed: () => navigation.plannerDraft.value = null,
                         icon: const Icon(Icons.close),
                       ),
@@ -178,7 +176,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                       key: ValueKey(trip.id),
                       initialValue: trip.id,
                       isExpanded: true,
-                      decoration: const InputDecoration(labelText: 'Chuyến đi'),
+                      decoration: const InputDecoration(labelText: 'Trip'),
                       items: [
                         for (final entry in data.trips)
                           DropdownMenuItem(
@@ -195,7 +193,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     ),
                   ),
                   IconButton(
-                    tooltip: 'Xóa chuyến đi',
+                    tooltip: 'Delete trip',
                     onPressed: _busy ? null : () => _deleteTrip(trip),
                     icon: const Icon(Icons.delete_outline),
                   ),
@@ -209,15 +207,15 @@ class _PlannerScreenState extends State<PlannerScreen> {
               child: TextButton.icon(
                 onPressed: _busy ? null : _createTrip,
                 icon: const Icon(Icons.add),
-                label: const Text('Tạo chuyến đi'),
+                label: const Text('Create trip'),
               ),
             ),
             const SizedBox(height: 8),
             if (activities.isEmpty)
               Text(
                 trip == null
-                    ? 'Bạn chưa có chuyến đi nào.'
-                    : 'Chuyến đi này chưa có hoạt động.',
+                    ? 'You have no trips yet.'
+                    : 'This trip has no activities yet.',
               ),
             for (var i = 0; i < activities.length; i++) ...[
               if (i == 0 || activities[i - 1].day != activities[i].day)
@@ -261,7 +259,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
             time.format(context),
             if (item.costVnd != null && item.bookingId == null)
               '${item.costVnd} VND',
-            if (item.bookingId != null) 'Giá vé ${item.costVnd} VND',
+            if (item.bookingId != null) 'Ticket price: ${item.costVnd} VND',
             if (item.notes.isNotEmpty) item.notes,
           ].join(' · '),
         ),
@@ -279,15 +277,15 @@ class _PlannerScreenState extends State<PlannerScreen> {
           },
           itemBuilder: (_) => [
             if (item.bookingId == null)
-              const PopupMenuItem(value: 'edit', child: Text('Chỉnh sửa')),
+              const PopupMenuItem(value: 'edit', child: Text('Edit')),
             if (target != null)
-              const PopupMenuItem(value: 'map', child: Text('Mở bản đồ')),
+              const PopupMenuItem(value: 'map', child: Text('Open map')),
             PopupMenuItem(
               value: 'delete',
               child: Text(
                 item.bookingId == null
-                    ? 'Xóa hoạt động'
-                    : 'Gỡ vé khỏi lịch trình',
+                    ? 'Delete activity'
+                    : 'Remove ticket from itinerary',
               ),
             ),
           ],
@@ -336,7 +334,7 @@ class _TripDialogState extends State<_TripDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Tạo chuyến đi'),
+    title: const Text('Create trip'),
     content: Form(
       key: _form,
       child: Column(
@@ -345,18 +343,18 @@ class _TripDialogState extends State<_TripDialog> {
           TextFormField(
             controller: _title,
             autofocus: true,
-            decoration: const InputDecoration(labelText: 'Tên chuyến đi'),
+            decoration: const InputDecoration(labelText: 'Trip name'),
             validator: (text) => text == null || text.trim().isEmpty
-                ? 'Nhập tên chuyến đi'
+                ? 'Enter a trip name'
                 : null,
           ),
           TextButton(
             onPressed: () => _pickDate(start: true),
-            child: Text('Bắt đầu · ${_dayKey(_start)}'),
+            child: Text('Start date · ${_dayKey(_start)}'),
           ),
           TextButton(
             onPressed: () => _pickDate(start: false),
-            child: Text('Kết thúc · ${_dayKey(_end)}'),
+            child: Text('End date · ${_dayKey(_end)}'),
           ),
         ],
       ),
@@ -364,7 +362,7 @@ class _TripDialogState extends State<_TripDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Hủy'),
+        child: const Text('Cancel'),
       ),
       FilledButton(
         onPressed: () {
@@ -375,7 +373,7 @@ class _TripDialogState extends State<_TripDialog> {
             end: _dayKey(_end),
           ));
         },
-        child: const Text('Tạo'),
+        child: const Text('Create'),
       ),
     ],
   );
@@ -428,7 +426,7 @@ class _ActivityDialogState extends State<_ActivityDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text(widget.activity == null ? 'Thêm hoạt động' : 'Sửa hoạt động'),
+    title: Text(widget.activity == null ? 'Add activity' : 'Edit activity'),
     scrollable: true,
     content: Form(
       key: _form,
@@ -437,9 +435,9 @@ class _ActivityDialogState extends State<_ActivityDialog> {
         children: [
           TextFormField(
             controller: _title,
-            decoration: const InputDecoration(labelText: 'Tên hoạt động'),
+            decoration: const InputDecoration(labelText: 'Activity name'),
             validator: (text) => text == null || text.trim().isEmpty
-                ? 'Nhập tên hoạt động'
+                ? 'Enter an activity name'
                 : null,
           ),
           ListTile(
@@ -447,13 +445,13 @@ class _ActivityDialogState extends State<_ActivityDialog> {
             leading: const Icon(Icons.place_outlined),
             title: Text(
               _target == null
-                  ? 'Chọn địa danh (không bắt buộc)'
+                  ? 'Choose a place (optional)'
                   : widget.targetTitle(_target!) ?? _target!.id,
             ),
             trailing: _target == null
                 ? null
                 : IconButton(
-                    tooltip: 'Bỏ liên kết địa danh',
+                    tooltip: 'Remove linked place',
                     onPressed: () => setState(() => _target = null),
                     icon: const Icon(Icons.close),
                   ),
@@ -461,7 +459,7 @@ class _ActivityDialogState extends State<_ActivityDialog> {
               final result = await Navigator.of(context).push<RouteLocation>(
                 MaterialPageRoute<RouteLocation>(
                   builder: (_) => MapPlacePicker(
-                    title: 'Chọn địa danh',
+                    title: 'Choose a place',
                     places: widget.places,
                   ),
                 ),
@@ -477,20 +475,20 @@ class _ActivityDialogState extends State<_ActivityDialog> {
           ),
           TextFormField(
             controller: _notes,
-            decoration: const InputDecoration(labelText: 'Ghi chú'),
+            decoration: const InputDecoration(labelText: 'Notes'),
           ),
           TextFormField(
             controller: _cost,
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(
-              labelText: 'Chi phí dự kiến (VND)',
+              labelText: 'Estimated cost (VND)',
             ),
             validator: (text) {
               final value = text?.trim() ?? '';
               if (value.isEmpty) return null;
               final parsed = int.tryParse(value);
               return parsed == null || parsed < 0
-                  ? 'Nhập số nguyên không âm'
+                  ? 'Enter a whole number of zero or more'
                   : null;
             },
           ),
@@ -504,7 +502,7 @@ class _ActivityDialogState extends State<_ActivityDialog> {
               );
               if (mounted && date != null) setState(() => _day = date);
             },
-            child: Text('Ngày · ${_dayKey(_day)}'),
+            child: Text('Date · ${_dayKey(_day)}'),
           ),
           TextButton(
             onPressed: () async {
@@ -514,7 +512,7 @@ class _ActivityDialogState extends State<_ActivityDialog> {
               );
               if (mounted && time != null) setState(() => _time = time);
             },
-            child: Text('Giờ · ${_time.format(context)}'),
+            child: Text('Time · ${_time.format(context)}'),
           ),
         ],
       ),
@@ -522,7 +520,7 @@ class _ActivityDialogState extends State<_ActivityDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Hủy'),
+        child: const Text('Cancel'),
       ),
       FilledButton(
         onPressed: () {
@@ -542,7 +540,7 @@ class _ActivityDialogState extends State<_ActivityDialog> {
             ),
           );
         },
-        child: const Text('Lưu'),
+        child: const Text('Save'),
       ),
     ],
   );

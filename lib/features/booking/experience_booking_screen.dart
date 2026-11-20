@@ -62,7 +62,7 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
     if (!isFutureExperienceSlot(day, minute)) {
       setState(() {
         _minute = null;
-        _error = 'Khung giờ này đã qua. Hãy chọn khung giờ khác.';
+        _error = 'This time slot has passed. Choose another time.';
       });
       return;
     }
@@ -85,7 +85,8 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
     } catch (_) {
       if (mounted)
         setState(
-          () => _error = 'Chưa hoàn tất đặt vé. Vui lòng bấm Thanh toán lại.',
+          () =>
+              _error = 'Could not complete the booking. Tap Pay to try again.',
         );
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -108,7 +109,7 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            booking == null ? 'Đặt vé trải nghiệm' : 'Đặt vé thành công',
+            booking == null ? 'Book an experience' : 'Booking successful',
           ),
         ),
         body: SafeArea(
@@ -126,7 +127,7 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'Vé của bạn đã được lưu. Bạn có thể xem lại trong Hồ sơ → Vé của tôi.',
+                      'Your ticket is saved under Profile → My Tickets.',
                     ),
 
                     const SizedBox(height: 12),
@@ -137,29 +138,29 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
                       style: FilledButton.styleFrom(
                         backgroundColor: _brandGreen,
                       ),
-                      child: const Text('Xong'),
+                      child: const Text('Done'),
                     ),
                   ]
                 : [
                     Text(offer.title, style: theme.textTheme.headlineSmall),
                     const SizedBox(height: 6),
                     Text(
-                      'Phố cổ Hội An · ${formatTicketVnd(offer.priceVnd)}/khách',
+                      'Hội An Ancient Town · ${formatTicketVnd(offer.priceVnd)} per person',
                     ),
                     const SizedBox(height: 20),
                     OutlinedButton.icon(
                       onPressed: _saving ? null : _pickDay,
                       icon: const Icon(Icons.event_outlined),
-                      label: Text('Ngày trải nghiệm · ${formatTicketDay(day)}'),
+                      label: Text('Booking date · ${formatTicketDay(day)}'),
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Khung giờ tại Hội An',
+                      'Time slots in Hội An',
                       style: theme.textTheme.titleMedium,
                     ),
                     if (availableSlots.isEmpty)
                       const Text(
-                        'Hôm nay đã hết khung giờ. Hãy chọn ngày khác.',
+                        'No time slots left today. Choose another date.',
                       ),
                     Wrap(
                       spacing: 8,
@@ -180,12 +181,16 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
                     const SizedBox(height: 12),
                     DropdownButtonFormField<int>(
                       initialValue: _guests,
-                      decoration: const InputDecoration(labelText: 'Số khách'),
+                      decoration: const InputDecoration(
+                        labelText: 'Number of guests',
+                      ),
                       items: [
                         for (var count = 1; count <= offer.maxGuests; count++)
                           DropdownMenuItem(
                             value: count,
-                            child: Text('$count khách'),
+                            child: Text(
+                              count == 1 ? '1 guest' : '$count guests',
+                            ),
                           ),
                       ],
                       onChanged: _saving
@@ -215,7 +220,7 @@ class _ExperienceBookingScreenState extends State<ExperienceBookingScreen> {
                       style: FilledButton.styleFrom(
                         backgroundColor: _brandGreen,
                       ),
-                      child: Text(_saving ? 'Đang xác nhận…' : 'Thanh toán'),
+                      child: Text(_saving ? 'Confirming…' : 'Pay'),
                     ),
                   ],
           ),
@@ -241,14 +246,12 @@ class _PaymentSummary extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Tổng tiền · ${formatTicketVnd(total)}',
+            'Total · ${formatTicketVnd(total)}',
             style: Theme.of(context).textTheme.titleMedium
                 ?.copyWith(color: _brandGreen, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Xác nhận ngay trong app, không phát sinh giao dịch chuyển tiền.',
-          ),
+          const Text('Confirm in the app. No money will be transferred.'),
         ],
       ),
     ),
